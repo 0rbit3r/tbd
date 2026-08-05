@@ -1,17 +1,10 @@
+use super::task_state::TaskState;
+
 #[derive(Debug)]
 pub struct Task {
-    pub id: u32,
     pub title: String,
     pub state: TaskState,
     pub subtasks: Vec<Task>,
-}
-
-#[derive(Debug)]
-pub enum TaskState {
-    Untouched,
-    Started,
-    Postponed,
-    Done,
 }
 
 impl Task {
@@ -21,21 +14,15 @@ impl Task {
 
     fn render_level(&self, level: u8) -> String {
         format!(
-            "{:<5}{} [{}] {}{}",
-            self.id,
+            "{} {} {}{}",
             {
                 let mut padding: String = String::new();
-                for _ in 0..level + 1 {
+                for _ in 0..level {
                     padding += "    ";
                 }
                 padding
             },
-            match self.state {
-                TaskState::Untouched => " ",
-                TaskState::Started => ".",
-                TaskState::Postponed => "-",
-                TaskState::Done => "x",
-            },
+            self.state.decoration(),
             self.title,
             {
                 let mut result: String = String::new();
@@ -47,3 +34,4 @@ impl Task {
         )
     }
 }
+

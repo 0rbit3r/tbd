@@ -1,0 +1,13 @@
+sssžž
+[x] task renderer
+    [x] render method
+    [x] subtasks support
+[.] file parser and saver
+    [x] file format
+    [x] parser
+        [.] file read wrapper
+    [ ] saver
+[ ] api get tasks
+[ ] api save tasks
+[ ] api create task
+[ ] simple cli
