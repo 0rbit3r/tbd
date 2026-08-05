@@ -6,8 +6,7 @@ fn main() {
     println!("==========================");
     println!();
 
-    let task_file = TaskFile::from_file("tasks.tbd")
-        .expect("failed to load file"); 
+    let task_file = TaskFile::from_file("tasks.tbd").expect("failed to load file");
 
     for task in task_file.tasks {
         println!("{}", task.render());

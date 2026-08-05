@@ -31,6 +31,16 @@ impl TaskFile {
             tasks: result,
         })
     }
+
+    /// Saves the task file as a new file - will overwrite the path property
+    pub fn save_as(mut self) -> Option<()>{
+        todo!()
+    }
+
+    /// Saves file into the path defined on the TaskFile or returns None
+    pub fn save_file(&self) -> Option<()> {
+        todo!()
+    }
 }
 fn parse_line_and_add_to_task_list(line: &str, tasks: &mut Vec<Task>) -> Option<()> {
     let mut add_task = |title: &str, state: TaskState| {
@@ -41,11 +51,11 @@ fn parse_line_and_add_to_task_list(line: &str, tasks: &mut Vec<Task>) -> Option<
         })
     };
 
-    let valid_states = vec![
-        (TaskState::Untouched),
-        (TaskState::Done),
-        (TaskState::Started),
-        (TaskState::Skipped),
+    let valid_states = [
+        TaskState::Untouched,
+        TaskState::Done,
+        TaskState::Started,
+        TaskState::Skipped,
     ];
 
     let matched = valid_states.iter().find_map(|vs| {
