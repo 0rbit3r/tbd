@@ -14,7 +14,7 @@ impl Task {
 
     fn render_level(&self, level: u8) -> String {
         format!(
-            "{} {} {}{}",
+            "{}{}{}{}",
             {
                 let mut padding: String = String::new();
                 for _ in 0..level {
@@ -22,7 +22,14 @@ impl Task {
                 }
                 padding
             },
-            self.state.decoration(),
+            match self.state {
+                TaskState::Corrupted => "".to_string(),
+                _ => {
+                    let mut with_space = self.state.decoration().to_string();
+                    with_space += " ";
+                    with_space
+                }
+            },
             self.title,
             {
                 let mut result: String = String::new();

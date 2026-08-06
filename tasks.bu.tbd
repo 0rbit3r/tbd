@@ -1,15 +1,19 @@
 [x] task renderer
     [x] render method
     [x] subtasks support
-[x] file parser and saver
+sssžž malformed line
+[.] file parser and saver
     [x] file format
     [x] parser
-        [x] file read wrapper
-    [x] saver
+        [.] file read wrapper
+    [ ] saver
 [ ] api get tasks
+        [ ] (test) Too-far nested
 [ ] api save tasks
 [ ] api create task
 [ ] simple cli
     [ ] > Arrow selector to highlight a task
+	(test) some gibberish
     [ ] create task
     [ ] move task
+    žblepty žblept
