@@ -1,6 +1,6 @@
 use super::task_state::TaskState;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Task {
     pub title: String,
     pub state: TaskState,
@@ -8,11 +8,11 @@ pub struct Task {
 }
 
 impl Task {
-    pub fn render(&self) -> String {
-        self.render_level(0)
+    pub fn render(&self, mark_errors: bool) -> String {
+        self.render_level(0, mark_errors)
     }
 
-    fn render_level(&self, level: u8) -> String {
+    fn render_level(&self, level: u8, mark_errors: bool) -> String {
         format!(
             "{}{}{}{}",
             {
@@ -23,7 +23,12 @@ impl Task {
                 padding
             },
             match self.state {
-                TaskState::Corrupted => "".to_string(),
+                TaskState::Corrupted =>
+                    if mark_errors {
+                        "Err ".to_string()
+                    } else {
+                        "".to_string()
+                    },
                 _ => {
                     let mut with_space = self.state.decoration().to_string();
                     with_space += " ";
@@ -34,7 +39,7 @@ impl Task {
             {
                 let mut result: String = String::new();
                 for subtask in &self.subtasks {
-                    result = result + "\n" + &subtask.render_level(level + 1);
+                    result = result + "\n" + &subtask.render_level(level + 1, mark_errors);
                 }
                 result
             }

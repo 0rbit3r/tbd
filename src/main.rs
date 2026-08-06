@@ -20,7 +20,7 @@ fn main() {
             );
 
             for task in &task_file.tasks {
-                println!("{}", task.render());
+                println!("{}", task.render(false));
             }
             // match task_file.save_as("output.tbd") {
             //     Err(e) => {eprintln!("{e}")}

@@ -6,9 +6,10 @@
     [x] parser
         [x] file read wrapper
     [x] saver
-[ ] api get tasks
-[ ] api save tasks
-[ ] api create task
+[x] api get tasks
+[x] api save tasks
+asdfjh
+[x] api create task
 [ ] simple cli
     [ ] > Arrow selector to highlight a task
     [ ] create task
