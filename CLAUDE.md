@@ -43,6 +43,34 @@ first principles — they don't need general programming or CS fundamentals expl
 - Build: `cargo build`
 - Run: `cargo run`
 - Check (fast compile check): `cargo check`
-- Test: `cargo test` (no tests exist yet)
+- Test: `cargo test`
+- Run a single test: `cargo test <test_name>` (e.g. `cargo test parse_shallow`)
 - Format: `cargo fmt`
 - Lint: `cargo clippy`
+
+## Architecture
+
+`tbd` is split into a library (`src/lib.rs`) consumed by a thin binary (`src/main.rs`).
+
+- **`task::Task`** — a task has a `title`, a `TaskState`, and a `Vec<Task>` of `subtasks`
+  (tasks nest arbitrarily deep). `Task::render` turns a task (and its subtasks, indented 4
+  spaces per level) back into its on-disk text representation.
+- **`task_state::TaskState`** — enum of `Untouched`, `Started`, `Skipped`, `Done`, `Corrupted`.
+  Each state maps to a fixed text "decoration" prefix in the file format (`[ ]`, `[.]`, `[-]`,
+  `[x]`; `Corrupted` has no on-disk decoration — it's the fallback for unparseable lines).
+- **`task_file::TaskFile`** — owns the parsed task list plus an optional file `path`, and is
+  the entry point for reading/writing `.tbd` files (`from_file`, `from_string`, `save_as`,
+  `save_file`). It's a thin `mod.rs`-style file that pulls in three private submodules:
+  - `task_file::parse` — turns file text into a `Vec<Task>` line by line. Indentation (4
+    spaces per level) determines subtask nesting; a line that doesn't match a known state
+    decoration becomes a `Corrupted` task. Round-tripping (`parse` -> `render`) is expected to
+    be lossless for valid files, and is asserted directly in tests.
+  - `task_file::indexing` — converts a single flat `usize` index (as seen by a user scrolling
+    through the fully-expanded, depth-first-flattened task list) into a `multi_index`
+    (`Vec<usize>`, one index per tree level) that can address a specific nested task. Used to
+    let callers refer to tasks positionally without walking the tree themselves.
+  - `task_file::insert` — inserts a new `Task` into the tree at a given `multi_index`.
+- Task file format on disk: one task per line, `<decoration> <title>`, with subtasks indented
+  4 spaces deeper than their parent. See `tasks.tbd` (this project's own task list, eventually
+  meant to be managed by `tbd` itself) for a real example, and the tests in
+  `src/task_file/parse.rs` for the format's edge cases.

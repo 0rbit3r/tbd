@@ -15,6 +15,13 @@ pub struct TaskFile {
 }
 
 impl TaskFile {
+    pub fn new() -> TaskFile {
+        TaskFile {
+            path: None,
+            tasks: vec![],
+        }
+    }
+
     pub fn from_file(file_path: &str) -> Result<TaskFile, Box<dyn Error>> {
         let content = fs::read_to_string(file_path)?;
         let mut file = TaskFile::from_string(&content).ok_or("Failed to parse file.")?;
@@ -75,17 +82,18 @@ impl TaskFile {
         Ok(())
     }
 
-    pub fn insert_task(&mut self, new_task: Task, index: Option<usize>) {
+    // Will insert a new task under the specified index - either as a sibling when the task at index has no subtasks or as subtask otherwise
+    // None index will push new top-level task to the end
+    pub fn insert_task(&mut self, new_task: Task, index: Option<usize>) -> Option<()> {
         match index {
             None => {
                 self.tasks.push(new_task);
+                return Some(());
             }
             Some(i) => match self.get_multi_index(i) {
-                MultiIndexRes::NotFound(_) => return,
+                MultiIndexRes::NotFound(_) => return None,
                 MultiIndexRes::Found(multi_index) => {
-                    let insert_result =
-                        insert_task_to_task_tree(&mut self.tasks, new_task, &multi_index);
-                    println!("{insert_result:?}");
+                    return insert_task_to_task_tree(&mut self.tasks, new_task, &multi_index);
                 }
             },
         }
