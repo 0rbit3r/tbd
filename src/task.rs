@@ -8,11 +8,11 @@ pub struct Task {
 }
 
 impl Task {
-    pub fn render(&self, mark_errors: bool) -> String {
-        self.render_level(0, mark_errors)
+    pub fn render_file(&self) -> String {
+        self.render_file_level(0)
     }
 
-    fn render_level(&self, level: u8, mark_errors: bool) -> String {
+    fn render_file_level(&self, level: usize) -> String {
         format!(
             "{}{}{}{}",
             {
@@ -23,12 +23,7 @@ impl Task {
                 padding
             },
             match self.state {
-                TaskState::Corrupted =>
-                    if mark_errors {
-                        "Err ".to_string()
-                    } else {
-                        "".to_string()
-                    },
+                TaskState::Corrupted => "".to_string(),
                 _ => {
                     let mut with_space = self.state.decoration().to_string();
                     with_space += " ";
@@ -39,7 +34,40 @@ impl Task {
             {
                 let mut result: String = String::new();
                 for subtask in &self.subtasks {
-                    result = result + "\n" + &subtask.render_level(level + 1, mark_errors);
+                    result = result + "\n" + &subtask.render_file_level(level + 1);
+                }
+                result
+            }
+        )
+    }
+
+    pub fn render_screen(&self) -> String {
+        self.render_screen_level(0)
+    }
+
+    fn render_screen_level(&self, level: u8) -> String {
+        format!(
+            "{}{}{}{}",
+            {
+                let mut padding: String = String::new();
+                for _ in 0..level {
+                    padding += "    ";
+                }
+                padding
+            },
+            match self.state {
+                TaskState::Corrupted => "Err ".to_string(),
+                _ => {
+                    let mut with_space = self.state.decoration().to_string();
+                    with_space += " ";
+                    with_space
+                }
+            },
+            self.title,
+            {
+                let mut result: String = String::new();
+                for subtask in &self.subtasks {
+                    result = result + "\n" + &subtask.render_screen_level(level + 1);
                 }
                 result
             }

@@ -6,7 +6,7 @@ pub enum MultiIndexRes {
     Found(Vec<usize>),
 }
 
-pub fn index_to_multi_index(task_list: &Vec<Task>, desired_index: usize) -> MultiIndexRes {
+pub fn index_to_multi_index(task_list: &[Task], desired_index: usize) -> MultiIndexRes {
     let desired_index_orig = desired_index;
     let mut desired_index = desired_index;
     if task_list.is_empty() {
@@ -34,7 +34,7 @@ pub fn index_to_multi_index(task_list: &Vec<Task>, desired_index: usize) -> Mult
 
 #[cfg(test)]
 mod test {
-    use crate::task_file::{TaskFile, indexing::MultiIndexRes};
+    use crate::task_file::{TaskFile, indexing::{MultiIndexRes, index_to_multi_index}};
 
     #[test]
     fn flat_list_happy() {
@@ -47,7 +47,7 @@ mod test {
 
         let variations = vec![(0, [0]), (1, [1]), (2, [2])];
         for variation in variations {
-            match task_file.get_multi_index(variation.0) {
+            match index_to_multi_index(&task_file.tasks,variation.0) {
                 MultiIndexRes::Found(mi) => assert_eq!(mi, variation.1),
                 _ => panic!("Could not multi_index"),
             }
@@ -63,7 +63,7 @@ mod test {
         )
         .expect("this string should be parsed");
 
-        match task_file.get_multi_index(3) {
+        match index_to_multi_index(&task_file.tasks, 3) {
             MultiIndexRes::Found(_) => panic!("Found non-existent multi-index"),
             MultiIndexRes::NotFound(size) => assert_eq!(size, 3),
         }
@@ -98,7 +98,7 @@ mod test {
             (9, vec![1, 0]),
         ];
         for variation in variations {
-            match task_file.get_multi_index(variation.0) {
+            match index_to_multi_index(&task_file.tasks, variation.0) {
                 MultiIndexRes::Found(mi) => assert_eq!(mi, variation.1),
                 _ => panic!("Could not multi_index"),
             }

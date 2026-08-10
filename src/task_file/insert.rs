@@ -13,7 +13,7 @@ pub fn insert_task_to_task_tree(
             task_list.push(task);
             return Some(());
         }
-        if task_list[multi_index[0]].subtasks.len() == 0 {
+        if task_list[multi_index[0]].subtasks.is_empty() {
             task_list.insert(multi_index[0] + 1, task);
         } else {
             task_list[multi_index[0]].subtasks.insert(0, task);
@@ -25,7 +25,7 @@ pub fn insert_task_to_task_tree(
         None => task_list.push(task),
         Some((first_index, rest_of_indexes)) => match task_list.get_mut(*first_index) {
             Some(subtask) => {
-                insert_task_to_task_tree(&mut subtask.subtasks, task, rest_of_indexes);
+                return insert_task_to_task_tree(&mut subtask.subtasks, task, rest_of_indexes);
             }
             None => {
                 return None;
@@ -53,7 +53,7 @@ mod test {
         };
 
         let insert_result = task_file.insert_task(inserted_task, Some(69));
-        let rendered = task_file.render_screen();
+        let rendered = task_file.render_file();
 
         assert_eq!(4, rendered.lines().count());
         assert_eq!(None, insert_result);
@@ -69,7 +69,7 @@ mod test {
         };
 
         let insert_result = task_file.insert_task(inserted_task, None);
-        let rendered = task_file.render_screen();
+        let rendered = task_file.render_file();
 
         assert_eq!(1, rendered.lines().count());
         assert_eq!(Some(()), insert_result);
@@ -101,7 +101,7 @@ mod test {
             .expect("parsable tasks");
 
             task_file.insert_task(inserted_task, Some(index));
-            let rendered = task_file.render_screen();
+            let rendered = task_file.render_file();
 
             let line = rendered
                 .lines()

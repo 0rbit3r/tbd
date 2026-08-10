@@ -6,11 +6,29 @@
     [x] parser
         [x] file read wrapper
     [x] saver
-[x] api get tasks
-[x] api save tasks
-asdfjh
-[x] api create task
+[x] core logic
+    [x] save taskfile
+    [x] create taskfile
+    [x] insert task
+    [x] get task
+    [ ] remove task
+    [ ] indent task
+    [ ] move task
+    [ ] rename task
+
 [ ] simple cli
     [ ] > Arrow selector to highlight a task
-    [ ] create task
-    [ ] move task
+    [ ] move the arrow selector by redrawing
+    [ ] connect functionality
+        [ ] create
+        [ ] remove
+    
+[ ] better tui
+    [ ] colors
+    [ ] mouse support
+    [ ] hide done/skipped
+    [ ] scroll
+    [ ] nice UI (hints, border?)
+
+[ ] publish on crates.io
+

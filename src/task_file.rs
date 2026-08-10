@@ -1,17 +1,28 @@
+mod get_task;
+mod indentation;
 mod indexing;
 mod insert;
 mod parse;
+mod remove;
 
-use self::indexing::*;
-use self::insert::*;
-use self::parse::*;
+use crate::task_state::TaskState;
+use get_task::get_task;
+use get_task::get_task_mut;
+use indentation::indent_task_r;
+use indentation::unindent_task_r;
+use remove::remove_task_r;
+
 use super::task::Task;
+use indexing::*;
+use insert::*;
+use parse::*;
 use std::error::Error;
 use std::fs;
 
 pub struct TaskFile {
     pub path: Option<String>,
     pub tasks: Vec<Task>,
+    pub cursor: Option<usize>,
 }
 
 impl TaskFile {
@@ -19,6 +30,7 @@ impl TaskFile {
         TaskFile {
             path: None,
             tasks: vec![],
+            cursor: None,
         }
     }
 
@@ -44,6 +56,7 @@ impl TaskFile {
         Some(TaskFile {
             path: None,
             tasks: result,
+            cursor: None,
         })
     }
 
@@ -57,15 +70,28 @@ impl TaskFile {
     pub fn render_screen(&self) -> String {
         let mut lines: Vec<String> = vec![];
         for task in &self.tasks {
-            lines.push(task.render(true))
+            lines.push(task.render_screen())
         }
-        lines.join("\n")
+        let all_tasks = lines.join("\n");
+        let mut pretty: Vec<String> = vec![];
+        for (i, line) in all_tasks.lines().enumerate() {
+            let mut pretty_line = String::from("");
+            pretty_line += if self.cursor == Some(i) {
+                ">>> "
+            } else {
+                "    "
+            };
+            pretty_line += line;
+            pretty.push(pretty_line.to_string());
+        }
+
+        pretty.join("\n")
     }
 
     pub fn render_file(&self) -> String {
         let mut lines: Vec<String> = vec![];
         for task in &self.tasks {
-            lines.push(task.render(false))
+            lines.push(task.render_file())
         }
         lines.join("\n")
     }
@@ -88,18 +114,83 @@ impl TaskFile {
         match index {
             None => {
                 self.tasks.push(new_task);
-                return Some(());
+                Some(())
             }
-            Some(i) => match self.get_multi_index(i) {
-                MultiIndexRes::NotFound(_) => return None,
+            Some(i) => match index_to_multi_index(&self.tasks, i) {
+                MultiIndexRes::NotFound(_) => None,
                 MultiIndexRes::Found(multi_index) => {
-                    return insert_task_to_task_tree(&mut self.tasks, new_task, &multi_index);
+                    insert_task_to_task_tree(&mut self.tasks, new_task, &multi_index)
                 }
             },
         }
     }
 
-    pub fn get_multi_index(&self, index: usize) -> MultiIndexRes {
-        index_to_multi_index(&self.tasks, index)
+    pub fn get_task_at(&self, index: usize) -> Option<&Task> {
+        let index = match index_to_multi_index(&self.tasks, index) {
+            MultiIndexRes::Found(mi) => mi,
+            MultiIndexRes::NotFound(_) => return None,
+        };
+        get_task(&self.tasks, &index)
+    }
+
+    pub fn get_task_at_mut(&mut self, index: usize) -> Option<&mut Task> {
+        let index = match index_to_multi_index(&self.tasks, index) {
+            MultiIndexRes::Found(mi) => mi,
+            MultiIndexRes::NotFound(_) => return None,
+        };
+        get_task_mut(&mut self.tasks, &index)
+    }
+
+    /// # Examples
+    /// ```
+    /// let mut task_file = tbd::task_file::TaskFile::from_string("[ ] Untouched").unwrap();
+    /// task_file.mark_as(0, tbd::task_state::TaskState::Done);
+    /// assert_eq!(tbd::task_state::TaskState::Done, task_file.tasks[0].state);
+    /// ```
+    /// ```
+    /// let mut task_file = tbd::task_file::TaskFile::from_string("[ ] Untouched").unwrap();
+    /// assert_eq!(None, task_file.mark_as(1, tbd::task_state::TaskState::Done));
+    /// ```
+    pub fn mark_as(&mut self, index: usize, new_state: TaskState) -> Option<()> {
+        let task = self.get_task_at_mut(index)?;
+        task.state = new_state;
+        Some(())
+    }
+
+    pub fn indent_task(&mut self, index: usize) -> Option<()> {
+        if index == 0 {
+            return None;
+        };
+        let index = match index_to_multi_index(&self.tasks, index) {
+            MultiIndexRes::Found(mi) => mi,
+            MultiIndexRes::NotFound(_) => return None,
+        };
+        indent_task_r(&mut self.tasks, &index)
+    }
+
+    pub fn unindent_task(&mut self, index: usize) -> Option<()> {
+        if index == 0 {
+            return None;
+        };
+        let index = match index_to_multi_index(&self.tasks, index) {
+            MultiIndexRes::Found(mi) => mi,
+            MultiIndexRes::NotFound(_) => return None,
+        };
+        unindent_task_r(&mut self.tasks, &index)
+    }
+
+    pub fn remove_task(&mut self, index: usize) -> Option<Task> {
+        let index = match index_to_multi_index(&self.tasks, index) {
+            MultiIndexRes::Found(mi) => mi,
+            MultiIndexRes::NotFound(_) => return None,
+        };
+        remove_task_r(&mut self.tasks, &index)
+    }
+}
+
+impl Default for TaskFile {
+
+    fn default() -> TaskFile {
+        Self::new()
     }
 }
