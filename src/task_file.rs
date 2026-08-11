@@ -22,7 +22,6 @@ use std::fs;
 pub struct TaskFile {
     pub path: Option<String>,
     pub tasks: Vec<Task>,
-    pub cursor: Option<usize>,
 }
 
 impl TaskFile {
@@ -30,7 +29,6 @@ impl TaskFile {
         TaskFile {
             path: None,
             tasks: vec![],
-            cursor: None,
         }
     }
 
@@ -56,7 +54,6 @@ impl TaskFile {
         Some(TaskFile {
             path: None,
             tasks: result,
-            cursor: None,
         })
     }
 
@@ -65,27 +62,6 @@ impl TaskFile {
         self.path = Some(path.to_string());
 
         self.save_file()
-    }
-
-    pub fn render_screen(&self) -> String {
-        let mut lines: Vec<String> = vec![];
-        for task in &self.tasks {
-            lines.push(task.render_screen())
-        }
-        let all_tasks = lines.join("\n");
-        let mut pretty: Vec<String> = vec![];
-        for (i, line) in all_tasks.lines().enumerate() {
-            let mut pretty_line = String::from("");
-            pretty_line += if self.cursor == Some(i) {
-                ">>> "
-            } else {
-                "    "
-            };
-            pretty_line += line;
-            pretty.push(pretty_line.to_string());
-        }
-
-        pretty.join("\n")
     }
 
     pub fn render_file(&self) -> String {
@@ -101,14 +77,15 @@ impl TaskFile {
         match &self.path {
             None => return Err("This task-file has no file associated. Use save_as.".into()),
             Some(path) => {
-                let content = self.render_screen();
+                let content = self.render_file();
                 fs::write(path, content)?;
             }
         }
         Ok(())
     }
 
-    // Will insert a new task under the specified index - either as a sibling when the task at index has no subtasks or as subtask otherwise
+    // Will insert a new task under the specified index
+    // - either as a sibling when the task at index has no subtasks or as subtask otherwise
     // None index will push new top-level task to the end
     pub fn insert_task(&mut self, new_task: Task, index: Option<usize>) -> Option<()> {
         match index {
@@ -168,7 +145,8 @@ impl TaskFile {
         indent_task_r(&mut self.tasks, &index)
     }
 
-    pub fn unindent_task(&mut self, index: usize) -> Option<()> {
+    ///returns how many lines down the task traveled
+    pub fn unindent_task(&mut self, index: usize) -> Option<usize> {
         if index == 0 {
             return None;
         };
@@ -186,10 +164,32 @@ impl TaskFile {
         };
         remove_task_r(&mut self.tasks, &index)
     }
+
+    pub fn move_task_up(&mut self, index: usize) -> Option<()> {
+        if index < 1 {
+            return None;
+        }
+        if let Some(task) = self.remove_task(index) {
+            if index == 1 {
+                self.tasks.insert(0, task);
+            } else {
+                self.insert_task(task, Some(index - 2));
+            }
+        };
+        Some(())
+    }
+    pub fn move_task_down(&mut self, index: usize) -> Option<()> {
+        // if index > tasks_count {
+        //     return None;
+        // } todo - get_size
+        if let Some(task) = self.remove_task(index) {
+            self.insert_task(task, Some(index));
+        };
+        Some(())
+    }
 }
 
 impl Default for TaskFile {
-
     fn default() -> TaskFile {
         Self::new()
     }

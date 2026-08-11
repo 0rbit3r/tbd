@@ -12,7 +12,7 @@ pub fn get_task<'a>(task_list: &'a [Task], index: &[usize]) -> Option<&'a Task> 
 }
 
 pub fn get_task_mut<'a>(task_list: &'a mut [Task], index: &[usize]) -> Option<&'a mut Task> {
-    if task_list.is_empty()  || task_list.len() <= index[0]{
+    if task_list.is_empty() || task_list.len() <= index[0] {
         return None;
     };
     if index.len() == 1 {
@@ -22,22 +22,24 @@ pub fn get_task_mut<'a>(task_list: &'a mut [Task], index: &[usize]) -> Option<&'
     }
 }
 
-
 #[cfg(test)]
 mod test {
     use crate::{task_file::TaskFile, task_state::TaskState};
 
     #[test]
-    fn get_task_happy(){
-        let mut task_file = TaskFile::from_string("[ ] Un
+    fn get_task_happy() {
+        let mut task_file = TaskFile::from_string(
+            "[ ] Un
 [x] Do
     [ ] Do1
     [ ] Do2
         [ ] Do21
     [ ] Do3
 [.] St
-[-] Sk").unwrap();
- 
+[-] Sk",
+        )
+        .unwrap();
+
         assert_eq!("Do", task_file.get_task_at(1).unwrap().title);
         assert_eq!("Do1", task_file.get_task_at(2).unwrap().title);
         assert_eq!("Do21", task_file.get_task_at(4).unwrap().title);

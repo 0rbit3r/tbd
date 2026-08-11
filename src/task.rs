@@ -8,8 +8,23 @@ pub struct Task {
 }
 
 impl Task {
+    pub fn new() -> Task {
+        Task {
+            title: String::new(),
+            state: TaskState::Untouched,
+            subtasks: vec![],
+        }
+    }
     pub fn render_file(&self) -> String {
         self.render_file_level(0)
+    }
+
+    pub fn get_count(&self) -> usize {
+        return if self.subtasks.is_empty() {
+            1
+        } else {
+            1 + self.subtasks.iter().fold(0, |f, t| f + t.get_count())
+        };
     }
 
     fn render_file_level(&self, level: usize) -> String {

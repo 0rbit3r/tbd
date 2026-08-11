@@ -188,9 +188,9 @@ gibberish"
     }
 
     #[test]
-    fn parse_and_render_mostly_equal(){
-        let task_file = TaskFile::from_string(get_nested_tasks_str())
-            .expect("content is parseable");
+    fn parse_and_render_mostly_equal() {
+        let task_file =
+            TaskFile::from_string(get_nested_tasks_str()).expect("content is parseable");
         let rendered = task_file.render_file();
         assert_eq!(get_nested_tasks_str(), rendered)
     }

@@ -13,7 +13,7 @@ pub fn indent_task_r(task_list: &mut Vec<Task>, index: &[usize]) -> Option<()> {
     }
 }
 
-pub fn unindent_task_r(task_list: &mut Vec<Task>, index: &[usize]) -> Option<()> {
+pub fn unindent_task_r(task_list: &mut Vec<Task>, index: &[usize]) -> Option<usize> {
     if index.len() < 2 {
         return None;
     }
@@ -22,9 +22,16 @@ pub fn unindent_task_r(task_list: &mut Vec<Task>, index: &[usize]) -> Option<()>
             return None;
         };
 
+        //todo count before and take into account length of one's own count
+
         let moved_task = remove_task_r(task_list, index)?;
+        let mut moved_by_lines = 0;
+        for task in &task_list[index[0]].subtasks[index[1]..task_list[index[0]].subtasks.len()] {
+            moved_by_lines += task.get_count();
+        }
         task_list.insert(index[0] + 1, moved_task);
-        Some(())
+
+        Some(moved_by_lines)
     } else {
         unindent_task_r(&mut task_list[index[0]].subtasks, &index[1..])
     }
@@ -67,7 +74,7 @@ mod test {
         .expect("parseable string");
 
         assert_eq!(None, task_file.unindent_task(0));
-        assert_eq!(Some(()), task_file.unindent_task(1));
+        assert_eq!(Some(0), task_file.unindent_task(1));
         assert_eq!(
             "[ ] A
 [ ] B
@@ -85,7 +92,7 @@ mod test {
         )
         .expect("parseable string");
 
-        assert_eq!(Some(()), task_file.unindent_task(2));
+        assert_eq!(Some(0), task_file.unindent_task(2));
         assert_eq!(
             "[ ] A
     [ ] B
@@ -107,7 +114,7 @@ mod test {
         )
         .expect("parseable string");
 
-        assert_eq!(Some(()), task_file.unindent_task(5));
+        assert_eq!(Some(0), task_file.unindent_task(5));
         assert_eq!(
             "[ ] A
     [ ] B
@@ -115,6 +122,32 @@ mod test {
 [ ] D
     [ ] E
 [ ] F
+[ ] G",
+            task_file.render_file()
+        );
+    }
+
+    #[test]
+    fn unindent_block_in_subtask() {
+        let mut task_file = TaskFile::from_string(
+            "[ ] A
+    [ ] B
+        [ ] C
+    [ ] D
+        [ ] E
+        [ ] F
+[ ] G",
+        )
+        .expect("parseable string");
+
+        assert_eq!(Some(3), task_file.unindent_task(1));
+        assert_eq!(
+            "[ ] A
+    [ ] D
+        [ ] E
+        [ ] F
+[ ] B
+    [ ] C
 [ ] G",
             task_file.render_file()
         );

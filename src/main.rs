@@ -1,12 +1,13 @@
-use tbd::simple_cli::run_simple_cli;
 use tbd::task_file::TaskFile;
+use tbd::tui::run;
+use std::env;
 
 fn main() {
-    match TaskFile::from_file("tasks.tbd") {
+    let args: Vec<String> = env::args().collect();
+    match TaskFile::from_file(&args[1]) { //todo - parser
         Err(e) => eprintln!("{e}"),
-        Ok(mut task_file) => {
-            task_file.cursor = Some(0);
-            run_simple_cli(task_file);
+        Ok(task_file) => {
+            let _ = run(task_file);
         }
     }
 

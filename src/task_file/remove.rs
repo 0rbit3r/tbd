@@ -41,7 +41,6 @@ mod test {
         assert_eq!("D", task_file.remove_task(1).unwrap().title);
         //remove A
         assert_eq!("A", task_file.remove_task(0).unwrap().title);
-        
     }
 
     #[test]

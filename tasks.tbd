@@ -11,24 +11,29 @@
     [x] create taskfile
     [x] insert task
     [x] get task
-    [ ] remove task
-    [ ] indent task
-    [ ] move task
-    [ ] rename task
-
-[ ] simple cli
-    [ ] > Arrow selector to highlight a task
-    [ ] move the arrow selector by redrawing
-    [ ] connect functionality
-        [ ] create
-        [ ] remove
-    
+    [x] remove task
+    [x] indent task
+    [x] rename task
+    [.] move task
+    [ ] mark parents (Started when child Done)
+[ ] cli
+    [x] open file
+    [ ] require argument to open a file
+[x] tui
+    [x] > Arrow selector to highlight a task
+    [x] move the arrow selector by redrawing
+    [x] functionality
+        [x] create
+        [x] remove
+        [x] rename
+        [x] move
+        [x] move and unindent should move cursor
+        [x] save
+        [ ] pgup and down
 [ ] better tui
     [ ] colors
     [ ] mouse support
     [ ] hide done/skipped
     [ ] scroll
     [ ] nice UI (hints, border?)
-
 [ ] publish on crates.io
-

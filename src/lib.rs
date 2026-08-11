@@ -1,4 +1,4 @@
 pub mod task;
 pub mod task_file;
 pub mod task_state;
-pub mod simple_cli;
+pub mod tui;
