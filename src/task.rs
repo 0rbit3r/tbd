@@ -20,11 +20,11 @@ impl Task {
     }
 
     pub fn get_count(&self) -> usize {
-        return if self.subtasks.is_empty() {
+        if self.subtasks.is_empty() {
             1
         } else {
             1 + self.subtasks.iter().fold(0, |f, t| f + t.get_count())
-        };
+        }
     }
 
     fn render_file_level(&self, level: usize) -> String {
@@ -87,5 +87,11 @@ impl Task {
                 result
             }
         )
+    }
+}
+
+impl Default for Task {
+    fn default() -> Task {
+        Task::new()
     }
 }

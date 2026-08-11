@@ -6,7 +6,6 @@ pub enum MultiIndexRes {
     Found(Vec<usize>),
 }
 
-
 pub fn index_to_multi_index(task_list: &[Task], desired_index: usize) -> MultiIndexRes {
     let desired_index_orig = desired_index;
     let mut desired_index = desired_index;
@@ -33,27 +32,38 @@ pub fn index_to_multi_index(task_list: &[Task], desired_index: usize) -> MultiIn
     MultiIndexRes::NotFound(desired_index_orig - desired_index)
 }
 
-// pub enum IndexRes {
-//     NotFound(usize), //size of explored elements
-//     Found(usize),    //found index
-// }
+pub enum IndexRes {
+    NotFound(usize), //size of explored elements
+    Found(usize),    //found index
+    Err,
+}
 
-// pub fn multi_index_to_index(task_list: &[Task], multi_index: &[usize]) -> IndexRes {
-//     let mut count = 0;
-//     for i in 0..multi_index[0] {
-//         count += task_list[i].get_count();
-//     }
-//     match multi_index_to_index(&task_list[multi_index[0]].subtasks, &multi_index[1..]) {
-//         IndexRes::Found(index) => IndexRes::Found(count + index),
-//         IndexRes::NotFound(size) => IndexRes::NotFound(size),
-//     }
-// }
+pub fn multi_index_to_index(task_list: &[Task], multi_index: &[usize]) -> IndexRes {
+    if task_list.len() <= multi_index[0] {
+        return IndexRes::Err;
+    }
+    let mut count = 0;
+    for i in 0..multi_index[0] {
+        count += task_list[i].get_count();
+    }
+    if multi_index.len() == 1 {
+        if task_list.len() <= multi_index[0] {
+            return IndexRes::NotFound(count);
+        }
+        return IndexRes::Found(count);
+    }
+    match multi_index_to_index(&task_list[multi_index[0]].subtasks, &multi_index[1..]) {
+        IndexRes::Found(index) => IndexRes::Found(count + index + 1),
+        IndexRes::NotFound(size) => IndexRes::NotFound(size),
+        IndexRes::Err => IndexRes::Err,
+    }
+}
 
 #[cfg(test)]
 mod test {
     use crate::task_file::{
         TaskFile,
-        indexing::{MultiIndexRes, index_to_multi_index},
+        indexing::{IndexRes, MultiIndexRes, index_to_multi_index, multi_index_to_index},
     };
 
     #[test]
@@ -65,11 +75,15 @@ mod test {
         )
         .expect("this string should be parsed");
 
-        let variations = vec![(0, [0]), (1, [1]), (2, [2])];
+        let variations = vec![(0, vec![0]), (1, vec![1]), (2, vec![2])];
         for variation in variations {
             match index_to_multi_index(&task_file.tasks, variation.0) {
-                MultiIndexRes::Found(mi) => assert_eq!(mi, variation.1),
-                _ => panic!("Could not multi_index"),
+                MultiIndexRes::Found(mi) => assert_eq!(variation.1, mi),
+                _ => panic!("Could not find multi_index"),
+            }
+            match multi_index_to_index(&task_file.tasks, &variation.1) {
+                IndexRes::Found(i) => assert_eq!(variation.0, i),
+                _ => panic!("Could not fin index"),
             }
         }
     }
@@ -84,8 +98,12 @@ mod test {
         .expect("this string should be parsed");
 
         match index_to_multi_index(&task_file.tasks, 3) {
-            MultiIndexRes::Found(_) => panic!("Found non-existent multi-index"),
-            MultiIndexRes::NotFound(size) => assert_eq!(size, 3),
+            MultiIndexRes::NotFound(size) => assert_eq!(3, size),
+            _ => panic!("Found non-existent multi-index"),
+        }
+        match multi_index_to_index(&task_file.tasks, &vec![1, 2]) {
+            IndexRes::Err => {}
+            _ => panic!("Found non-existend index"),
         }
     }
 
@@ -119,8 +137,12 @@ mod test {
         ];
         for variation in variations {
             match index_to_multi_index(&task_file.tasks, variation.0) {
-                MultiIndexRes::Found(mi) => assert_eq!(mi, variation.1),
-                _ => panic!("Could not multi_index"),
+                MultiIndexRes::Found(mi) => assert_eq!(variation.1, mi),
+                _ => panic!("Could not find multi_index"),
+            }
+            match multi_index_to_index(&task_file.tasks, &variation.1) {
+                IndexRes::Found(i) => assert_eq!(variation.0, i),
+                _ => panic!("Could not find index"),
             }
         }
     }

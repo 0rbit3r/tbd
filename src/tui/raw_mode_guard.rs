@@ -1,6 +1,6 @@
 use crossterm::execute;
-use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
 use crossterm::terminal::{EnterAlternateScreen, LeaveAlternateScreen};
+use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
 use std::io;
 
 pub struct RawModeGuard;

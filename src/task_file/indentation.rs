@@ -21,9 +21,6 @@ pub fn unindent_task_r(task_list: &mut Vec<Task>, index: &[usize]) -> Option<usi
         if index[0] >= task_list.len() || index[1] >= task_list[index[0]].subtasks.len() {
             return None;
         };
-
-        //todo count before and take into account length of one's own count
-
         let moved_task = remove_task_r(task_list, index)?;
         let mut moved_by_lines = 0;
         for task in &task_list[index[0]].subtasks[index[1]..task_list[index[0]].subtasks.len()] {

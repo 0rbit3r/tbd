@@ -4,10 +4,10 @@ mod tui_mode;
 
 use crossterm::event::{self, Event, KeyCode, KeyModifiers};
 
-use crate::task_file::TaskFile;
 use crate::tui::raw_mode_guard::RawModeGuard;
 use crate::tui::tui_mode::TuiMode;
 use std::io;
+use tbd::TaskFile;
 
 pub fn run(task_file: TaskFile) -> io::Result<()> {
     let _raw_mode_guard = RawModeGuard::new()?;
@@ -16,7 +16,7 @@ pub fn run(task_file: TaskFile) -> io::Result<()> {
         cursor: 0,
         mode: TuiMode::Normal,
         task_file,
-        message: None
+        message: None,
     };
 
     loop {
@@ -43,5 +43,5 @@ struct Tui {
     task_file: TaskFile,
     cursor: usize,
     mode: TuiMode,
-    message: Option<String>
+    message: Option<String>,
 }

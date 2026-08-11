@@ -13,7 +13,7 @@ use indentation::unindent_task_r;
 use remove::remove_task_r;
 
 use super::task::Task;
-use indexing::*;
+pub use indexing::{IndexRes, MultiIndexRes, index_to_multi_index, multi_index_to_index};
 use insert::*;
 use parse::*;
 use std::error::Error;
@@ -120,13 +120,13 @@ impl TaskFile {
 
     /// # Examples
     /// ```
-    /// let mut task_file = tbd::task_file::TaskFile::from_string("[ ] Untouched").unwrap();
-    /// task_file.mark_as(0, tbd::task_state::TaskState::Done);
-    /// assert_eq!(tbd::task_state::TaskState::Done, task_file.tasks[0].state);
+    /// let mut task_file = tbd::TaskFile::from_string("[ ] Untouched").unwrap();
+    /// task_file.mark_as(0, tbd::TaskState::Done);
+    /// assert_eq!(tbd::TaskState::Done, task_file.tasks[0].state);
     /// ```
     /// ```
-    /// let mut task_file = tbd::task_file::TaskFile::from_string("[ ] Untouched").unwrap();
-    /// assert_eq!(None, task_file.mark_as(1, tbd::task_state::TaskState::Done));
+    /// let mut task_file = tbd::TaskFile::from_string("[ ] Untouched").unwrap();
+    /// assert_eq!(None, task_file.mark_as(1, tbd::TaskState::Done));
     /// ```
     pub fn mark_as(&mut self, index: usize, new_state: TaskState) -> Option<()> {
         let task = self.get_task_at_mut(index)?;

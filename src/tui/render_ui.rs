@@ -16,7 +16,7 @@ impl Tui {
             pretty.push(pretty_line.to_string());
         }
 
-        let mut full = String::from(self.render_header());
+        let mut full = self.render_header();
         full += pretty.join("\n").as_str();
         full += self.render_footer().as_str();
         full
@@ -32,8 +32,8 @@ impl Tui {
                 .unwrap_or("    no file"),
         };
         format!(
-            "    {title}\n===={} to be done =\n\n",
-            "=".repeat(title.len() + 4)
+            "    {title}\n----{} to be done -\n\n",
+            "-".repeat(title.len() + 4)
         )
     }
 
