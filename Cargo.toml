@@ -1,7 +1,10 @@
 [package]
 name = "tbd"
-version = "0.1.0"
+version = "0.0.1"
 edition = "2024"
+description = "Dead simple terminal todo app"
+license = "MIT"
+repository = "https://github.com/0rbit3r/tbd"
 
 [dependencies]
 crossterm = "0.29.0"
