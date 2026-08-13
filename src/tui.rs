@@ -1,6 +1,5 @@
 mod raw_mode_guard;
 mod render_ui;
-mod renderer;
 mod tui_mode;
 
 use crossterm::event::{self, Event, KeyCode, KeyModifiers};
