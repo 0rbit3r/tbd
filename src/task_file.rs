@@ -187,6 +187,9 @@ impl TaskFile {
         };
         Some(())
     }
+    pub fn tasks_count(&self) -> usize {
+        self.tasks.iter().map(|t| t.get_count()).sum()
+    }
 }
 
 impl Default for TaskFile {

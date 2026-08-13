@@ -15,8 +15,9 @@ impl Tui {
             TuiMode::Normal => {
                 match key_event.code {
                     KeyCode::Char('j') | KeyCode::Down => {
-                        //todo iterator for taskFile and length check here
-                        self.cursor += 1;
+                        if self.task_file.tasks_count() > self.cursor + 1 {
+                            self.cursor += 1;
+                        }
                     }
                     KeyCode::Char('k') | KeyCode::Up => {
                         if self.cursor > 0 {
@@ -32,7 +33,7 @@ impl Tui {
                         {
                             if mi.len() == 1 {
                                 if let IndexRes::Found(i) =
-                                    multi_index_to_index(&self.task_file.tasks, &vec![mi[0] - 1])
+                                    multi_index_to_index(&self.task_file.tasks, &[mi[0] - 1])
                                 {
                                     self.cursor = i;
                                 }
@@ -47,25 +48,22 @@ impl Tui {
                         }
                     }
                     KeyCode::PageDown => {
-                        // if self.cursor == 0 {// todo...
-                        //     return;
-                        // }
                         if let MultiIndexRes::Found(mi) =
                             index_to_multi_index(&self.task_file.tasks, self.cursor)
                         {
                             if mi.len() == 1 {
                                 if let IndexRes::Found(i) =
-                                    multi_index_to_index(&self.task_file.tasks, &vec![mi[0] + 1])
+                                    multi_index_to_index(&self.task_file.tasks, &[mi[0] + 1])
                                 {
                                     self.cursor = i;
                                 }
                             } else {
                                 let mut level_down = mi.clone();
-                                let second_last =  level_down.len()-2;
-                                level_down[second_last] +=1;
+                                let second_last = level_down.len() - 2;
+                                level_down[second_last] += 1;
                                 if let IndexRes::Found(i) = multi_index_to_index(
                                     &self.task_file.tasks,
-                                    &level_down[0..mi.len()-1],
+                                    &level_down[0..mi.len() - 1],
                                 ) {
                                     self.cursor = i;
                                 }
@@ -86,6 +84,7 @@ impl Tui {
                                 TaskState::Untouched => TaskState::Started,
                                 TaskState::Started => TaskState::Done,
                                 TaskState::Done => TaskState::Skipped,
+                                TaskState::Skipped => TaskState::NonTask,
                                 _ => TaskState::Untouched,
                             }
                         }

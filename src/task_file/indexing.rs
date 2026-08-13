@@ -43,8 +43,8 @@ pub fn multi_index_to_index(task_list: &[Task], multi_index: &[usize]) -> IndexR
         return IndexRes::Err;
     }
     let mut count = 0;
-    for i in 0..multi_index[0] {
-        count += task_list[i].get_count();
+    for task in task_list.iter().take(multi_index[0]) {
+        count += task.get_count();
     }
     if multi_index.len() == 1 {
         if task_list.len() <= multi_index[0] {

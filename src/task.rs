@@ -1,3 +1,7 @@
+use crossterm::style::Stylize;
+
+use crate::color::{get_lighter, to_crossterm_color};
+
 use super::task_state::TaskState;
 
 #[derive(Debug, PartialEq)]
@@ -15,9 +19,6 @@ impl Task {
             subtasks: vec![],
         }
     }
-    pub fn render_file(&self) -> String {
-        self.render_file_level(0)
-    }
 
     pub fn get_count(&self) -> usize {
         if self.subtasks.is_empty() {
@@ -25,6 +26,10 @@ impl Task {
         } else {
             1 + self.subtasks.iter().fold(0, |f, t| f + t.get_count())
         }
+    }
+
+    pub fn render_file(&self) -> String {
+        self.render_file_level(0)
     }
 
     fn render_file_level(&self, level: usize) -> String {
@@ -38,7 +43,7 @@ impl Task {
                 padding
             },
             match self.state {
-                TaskState::Corrupted => "".to_string(),
+                TaskState::NonTask => "".to_string(),
                 _ => {
                     let mut with_space = self.state.decoration().to_string();
                     with_space += " ";
@@ -56,11 +61,11 @@ impl Task {
         )
     }
 
-    pub fn render_screen(&self) -> String {
-        self.render_screen_level(0)
+    pub fn render_screen(&self, color: (u8, u8, u8)) -> String {
+        self.render_screen_level(0, color)
     }
 
-    fn render_screen_level(&self, level: u8) -> String {
+    fn render_screen_level(&self, level: u8, color: (u8, u8, u8)) -> String {
         format!(
             "{}{}{}{}",
             {
@@ -70,19 +75,21 @@ impl Task {
                 }
                 padding
             },
-            match self.state {
-                TaskState::Corrupted => "Err ".to_string(),
-                _ => {
-                    let mut with_space = self.state.decoration().to_string();
-                    with_space += " ";
-                    with_space
-                }
-            },
-            self.title,
             {
+                let mut with_space = self.state.decoration_color(color).to_string();
+                with_space += " ";
+                with_space
+            },{
+            let mut color = color;
+            for _ in 0..level {color = get_lighter(color);}
+            self.title
+                .clone()
+                .with(to_crossterm_color(if self.state == TaskState::NonTask {(150,150,150)} else {color}))
+                .to_string()
+            },{
                 let mut result: String = String::new();
                 for subtask in &self.subtasks {
-                    result = result + "\n" + &subtask.render_screen_level(level + 1);
+                    result = result + "\n" + &subtask.render_screen_level(level + 1, color);
                 }
                 result
             }

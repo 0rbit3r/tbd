@@ -15,26 +15,34 @@
     [x] indent task
     [x] rename task
     [x] move task
-    [ ] mark parents (Started when child Done)
+        [x] fix the moveup bug
+        [ ] better move logic
+            Leave moveUp as is but add MovePageUp and Shift+moveUp?
+    [x] try NoTask instead of Malformed ("notes")
+    [ ] collapsable tasks 
+        [ ] Task.get_subtasks_or_collapsed()
 [ ] cli
     [x] open file
-    [ ] require argument to open a file
+    [ ] proper arg parsing
+    [ ] create new file
 [x] tui
     [x] > Arrow selector to highlight a task
     [x] move the arrow selector by redrawing
     [x] create
-    [x] remove
     [x] rename
     [x] move
     [x] move and unindent should move cursor
     [x] save
-    [ ] pgup and down
+    [x] pgup and down
+    [x] remove
     [ ] multi-select
     [ ] cursor-based edit (and delete)
 [ ] better tui
-    [ ] colors
+    [x] colors 
+    [ ] flicker
     [ ] mouse support
     [ ] hide done/skipped
     [ ] scroll
-    [ ] nice UI (hints, border?)
+    [ ] border
+    [ ] hints
 [ ] publish on crates.io

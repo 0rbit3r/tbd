@@ -17,7 +17,7 @@ pub fn parse_line_and_add_to_task_list(line: &str, tasks: &mut Vec<Task>) {
         TaskState::Done,
         TaskState::Started,
         TaskState::Skipped,
-        TaskState::Corrupted,
+        TaskState::NonTask,
     ];
 
     let matched = valid_states.iter().find_map(|vs| {
@@ -37,10 +37,10 @@ pub fn parse_line_and_add_to_task_list(line: &str, tasks: &mut Vec<Task>) {
                         Some(last_task) => {
                             parse_line_and_add_to_task_list(l, &mut last_task.subtasks)
                         }
-                        None => add_task(tasks, line, TaskState::Corrupted),
+                        None => add_task(tasks, line, TaskState::NonTask),
                     };
                 }
-                None => add_task(tasks, line, TaskState::Corrupted),
+                None => add_task(tasks, line, TaskState::NonTask),
             }
         }
     };
@@ -100,7 +100,7 @@ gibberish"
                 subtasks: vec![],
             },
             Task {
-                state: TaskState::Corrupted,
+                state: TaskState::NonTask,
                 title: "gibberish".to_string(),
                 subtasks: vec![],
             },
@@ -125,7 +125,7 @@ gibberish"
                         subtasks: vec![],
                     },
                     Task {
-                        state: TaskState::Corrupted,
+                        state: TaskState::NonTask,
                         title: "subgibberish".to_string(),
                         subtasks: vec![],
                     },
@@ -171,13 +171,13 @@ gibberish"
                 state: TaskState::Done,
                 title: "Done".to_string(),
                 subtasks: vec![Task {
-                    state: TaskState::Corrupted,
+                    state: TaskState::NonTask,
                     title: "    [ ] Too far gone".to_string(),
                     subtasks: vec![],
                 }],
             },
             Task {
-                state: TaskState::Corrupted,
+                state: TaskState::NonTask,
                 title: "gibberish".to_string(),
                 subtasks: vec![],
             },

@@ -1,3 +1,6 @@
+use crossterm::style::Stylize;
+use tbd::color::get_title_color;
+
 use crate::tui::{Tui, tui_mode::TuiMode};
 
 impl Tui {
@@ -5,13 +8,16 @@ impl Tui {
         let mut lines: Vec<String> = vec![];
 
         for task in &self.task_file.tasks {
-            lines.push(task.render_screen())
+            let color = get_title_color(&task.title);
+            let colored_text = task.render_screen(color);
+            lines.push(colored_text);
         }
         let all_tasks = lines.join("\n");
         let mut pretty: Vec<String> = vec![];
         for (i, line) in all_tasks.lines().enumerate() {
             let mut pretty_line = String::from("");
-            pretty_line += if self.cursor == i { ">>> " } else { "    " };
+            let cursor = ">>> ".white().to_string();
+            pretty_line += if self.cursor == i { &cursor } else { "    " };
             pretty_line += line;
             pretty.push(pretty_line.to_string());
         }
@@ -32,7 +38,7 @@ impl Tui {
                 .unwrap_or("    no file"),
         };
         format!(
-            "    {title}\n----{} to be done -\n\n",
+            "        {title}\n----{} to be done -\n\n",
             "-".repeat(title.len() + 4)
         )
     }

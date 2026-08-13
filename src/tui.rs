@@ -1,5 +1,6 @@
 mod raw_mode_guard;
 mod render_ui;
+mod renderer;
 mod tui_mode;
 
 use crossterm::event::{self, Event, KeyCode, KeyModifiers};
@@ -20,11 +21,16 @@ pub fn run(task_file: TaskFile) -> io::Result<()> {
     };
 
     loop {
-        print!("{esc}[2J{esc}[1;1H", esc = 27 as char);
+        let cursor_reset = format!("{esc}[1;1H", esc = 27 as char);
+        let clear_line = format!("{esc}[0K", esc = 27 as char);
 
-        for line in tui.render_ui().lines() {
-            print!("{line}\r\n");
-        }
+        let rendered_lines = tui
+            .render_ui()
+            .lines()
+            .collect::<Vec<_>>()
+            .join(&format!("{clear_line}\r\n"));
+        print!("{cursor_reset}{rendered_lines}");
+        //            print!("{esc}[0J", esc = 27 as char);
 
         if let Event::Key(key_event) = event::read()? {
             tui.handle_input(key_event);
