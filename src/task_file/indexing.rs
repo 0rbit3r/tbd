@@ -17,8 +17,12 @@ pub fn index_to_multi_index(task_list: &[Task], desired_index: usize) -> MultiIn
         if desired_index == 0 {
             return MultiIndexRes::Found(vec![local_i]);
         }
-
         desired_index -= 1;
+
+        if task.is_collapsed {
+            continue;
+        }
+
         match index_to_multi_index(&task.subtasks, desired_index) {
             MultiIndexRes::NotFound(size) => {
                 desired_index -= size;

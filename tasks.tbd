@@ -1,12 +1,12 @@
-[x] task renderer
+[x] task renderer ...
     [x] render method
     [x] subtasks support
-[x] file parser and saver
+[x] file parser and saver ...
     [x] file format
     [x] parser
         [x] file read wrapper
     [x] saver
-[x] core logic
+[x] core logic ...
     [x] save taskfile
     [x] create taskfile
     [x] insert task
@@ -16,17 +16,9 @@
     [x] rename task
     [x] move task
         [x] fix the moveup bug
-        [ ] better move logic
-            Leave moveUp as is
-            but add shift+up as well
     [x] try NoTask instead of Malformed ("notes")
-    [ ] collapsable tasks 
-        [ ] Task.get_subtasks_or_collapsed()
-[ ] cli
-    [x] open file
-    [ ] proper arg parsing
-    [ ] create new file
-[x] basic tui     
+[x] publish on crates.io
+[x] basic tui      ...
     [x] > Arrow selector to highlight a task
     [x] move the arrow selector by redrawing
     [x] create
@@ -36,9 +28,11 @@
     [x] save
     [x] pgup and down
     [x] remove
-    [ ] multi-select
-    [ ] cursor-based edit (and delete)
-[ ] better tui
+[.] cli
+    [x] open file
+    [ ] proper arg parsing
+    [ ] create new file
+[.] better tui
     [x] colors 
     [.] flicker
     [ ] mouse support
@@ -46,6 +40,12 @@
     [ ] scroll
     [ ] border
     [ ] hints
-[x] publish on crates.io
+[ ] cursor-based edit (and delete) 
+[ ] better move logic
+    Leave moveUp as is
+    but add shift+up as well
 [ ] bugs        
     [ ] word-wrap breaks things
+[ ] collapsable tasks 
+    [x] Task.get_subtasks_or_collapsed()
+    [ ] moving through collapsed

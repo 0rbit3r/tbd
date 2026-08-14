@@ -4,11 +4,12 @@ use crate::task_state::TaskState;
 /// This function will parse the string into provided Tasks vector.
 /// In case of syntax errors, affected lines will be added as Malformed tasks
 pub fn parse_line_and_add_to_task_list(line: &str, tasks: &mut Vec<Task>) {
-    fn add_task(tasks: &mut Vec<Task>, title: &str, state: TaskState) {
+    fn add_task(tasks: &mut Vec<Task>, title: &str, state: TaskState, collapsed: bool) {
         tasks.push(Task {
             title: title.to_string(),
             state,
             subtasks: vec![],
+            is_collapsed: collapsed,
         })
     }
 
@@ -20,14 +21,20 @@ pub fn parse_line_and_add_to_task_list(line: &str, tasks: &mut Vec<Task>) {
         TaskState::NonTask,
     ];
 
+    let mut collapsed = false;
     let matched = valid_states.iter().find_map(|vs| {
         let rest_of_line = line.strip_prefix(vs.decoration())?.strip_prefix(" ")?;
         Some((rest_of_line, *vs))
     });
 
     match matched {
-        Some(m) => {
-            add_task(tasks, m.0, m.1);
+        Some(mut m) => {
+            if let Some(title) = m.0.strip_suffix(" ...") {
+                m.0 = title;
+                collapsed = true;
+            }
+
+            add_task(tasks, m.0, m.1, collapsed);
         }
         None => {
             let subtask_line = line.strip_prefix("    ");
@@ -37,10 +44,10 @@ pub fn parse_line_and_add_to_task_list(line: &str, tasks: &mut Vec<Task>) {
                         Some(last_task) => {
                             parse_line_and_add_to_task_list(l, &mut last_task.subtasks)
                         }
-                        None => add_task(tasks, line, TaskState::NonTask),
+                        None => add_task(tasks, line, TaskState::NonTask, collapsed),
                     };
                 }
-                None => add_task(tasks, line, TaskState::NonTask),
+                None => add_task(tasks, line, TaskState::NonTask, collapsed),
             }
         }
     };
@@ -62,7 +69,7 @@ gibberish"
         "[ ] Untouched
     [ ] Untouched nested
     subgibberish
-[.] Started
+[.] Started ...
     [.] Substarted 1
     [.] Substarted 2
 [-] Skipped
@@ -83,26 +90,31 @@ gibberish"
                 state: TaskState::Untouched,
                 title: "Untouched".to_string(),
                 subtasks: vec![],
+                is_collapsed: false,
             },
             Task {
                 state: TaskState::Started,
                 title: "Started".to_string(),
                 subtasks: vec![],
+                is_collapsed: false,
             },
             Task {
                 state: TaskState::Skipped,
                 title: "Skipped".to_string(),
                 subtasks: vec![],
+                is_collapsed: false,
             },
             Task {
                 state: TaskState::Done,
                 title: "Done".to_string(),
                 subtasks: vec![],
+                is_collapsed: false,
             },
             Task {
                 state: TaskState::NonTask,
                 title: "gibberish".to_string(),
                 subtasks: vec![],
+                is_collapsed: false,
             },
         ];
         for i in 0..5 {
@@ -118,38 +130,45 @@ gibberish"
             Task {
                 state: TaskState::Untouched,
                 title: "Untouched".to_string(),
+                is_collapsed: false,
                 subtasks: vec![
                     Task {
                         state: TaskState::Untouched,
                         title: "Untouched nested".to_string(),
                         subtasks: vec![],
+                        is_collapsed: false,
                     },
                     Task {
                         state: TaskState::NonTask,
                         title: "subgibberish".to_string(),
                         subtasks: vec![],
+                        is_collapsed: false,
                     },
                 ],
             },
             Task {
                 state: TaskState::Started,
                 title: "Started".to_string(),
+                is_collapsed: true,
                 subtasks: vec![
                     Task {
                         state: TaskState::Started,
                         title: "Substarted 1".to_string(),
                         subtasks: vec![],
+                        is_collapsed: false,
                     },
                     Task {
                         state: TaskState::Started,
                         title: "Substarted 2".to_string(),
                         subtasks: vec![],
+                        is_collapsed: false,
                     },
                 ],
             },
             Task {
                 state: TaskState::Skipped,
                 title: "Skipped".to_string(),
+                is_collapsed: false,
                 subtasks: vec![
                     Task {
                         state: TaskState::Skipped,
@@ -158,28 +177,34 @@ gibberish"
                             state: TaskState::Skipped,
                             title: "Subsubskipped".to_string(),
                             subtasks: vec![],
+                            is_collapsed: false,
                         }],
+                        is_collapsed: false,
                     },
                     Task {
                         state: TaskState::Skipped,
                         title: "Subskipped 2".to_string(),
                         subtasks: vec![],
+                        is_collapsed: false,
                     },
                 ],
             },
             Task {
                 state: TaskState::Done,
                 title: "Done".to_string(),
+                is_collapsed: false,
                 subtasks: vec![Task {
                     state: TaskState::NonTask,
                     title: "    [ ] Too far gone".to_string(),
                     subtasks: vec![],
+                    is_collapsed: false,
                 }],
             },
             Task {
                 state: TaskState::NonTask,
                 title: "gibberish".to_string(),
                 subtasks: vec![],
+                is_collapsed: false,
             },
         ];
         for i in 0..5 {

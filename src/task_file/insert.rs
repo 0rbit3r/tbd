@@ -49,7 +49,7 @@ mod test {
         let inserted_task = Task {
             state: TaskState::Done,
             title: "NEW".to_string(),
-            subtasks: vec![],
+            subtasks: vec![],is_collapsed: false,
         };
 
         let insert_result = task_file.insert_task(inserted_task, Some(69));
@@ -65,7 +65,7 @@ mod test {
         let inserted_task = Task {
             state: TaskState::Done,
             title: "NEW".to_string(),
-            subtasks: vec![],
+            subtasks: vec![],is_collapsed: false,
         };
 
         let insert_result = task_file.insert_task(inserted_task, None);
@@ -86,7 +86,7 @@ mod test {
             let inserted_task = Task {
                 state: TaskState::Done,
                 title: title.to_string(),
-                subtasks: vec![],
+                subtasks: vec![],is_collapsed: false,
             };
             let mut task_file = TaskFile::from_string(
                 "[ ] U

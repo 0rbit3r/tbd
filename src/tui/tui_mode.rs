@@ -109,6 +109,11 @@ impl Tui {
                         self.cursor += 1;
                         self.mode = TuiMode::Edit;
                     }
+                    KeyCode::Char('c') => {
+                        if let Some(task) = self.task_file.get_task_at_mut(self.cursor){
+                            task.is_collapsed = !task.is_collapsed;
+                        }
+                    }
                     _ => {
                         return None;
                     }
@@ -167,8 +172,11 @@ impl Tui {
     pub fn get_hint(&self) -> &str {
         match self.mode {
             TuiMode::Normal => {
-                "  ↓/↑/j/k: move cursor  ←/→/h/l: (un)indent task  PgUp/PgDn: jump up/down
-  s: save  q: quit  d: delete  a: add  i: edit  "
+                "
+  ↓/↑/j/k: move cursor   PgUp/PgDn: move faster
+  ←/→/h/l: (un)indent    c: toggle collapsed
+  s: save    q: quit     d: delete    a: add
+  i: edit"
             }
             TuiMode::Edit => "  esc/enter: confirm",
             TuiMode::Move => "  ↓/↑/j/k: move task  ←/→/h/l: (un)indent task",

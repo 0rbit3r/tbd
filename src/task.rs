@@ -8,6 +8,7 @@ use super::task_state::TaskState;
 pub struct Task {
     pub title: String,
     pub state: TaskState,
+    pub is_collapsed: bool,
     pub subtasks: Vec<Task>,
 }
 
@@ -17,11 +18,12 @@ impl Task {
             title: String::new(),
             state: TaskState::Untouched,
             subtasks: vec![],
+            is_collapsed: false,
         }
     }
 
     pub fn get_count(&self) -> usize {
-        if self.subtasks.is_empty() {
+        if self.subtasks.is_empty() || self.is_collapsed{
             1
         } else {
             1 + self.subtasks.iter().fold(0, |f, t| f + t.get_count())
@@ -34,7 +36,7 @@ impl Task {
 
     fn render_file_level(&self, level: usize) -> String {
         format!(
-            "{}{}{}{}",
+            "{}{}{}{}{}",
             {
                 let mut padding: String = String::new();
                 for _ in 0..level {
@@ -51,6 +53,7 @@ impl Task {
                 }
             },
             self.title,
+            { if self.is_collapsed { " ..." } else { "" } },
             {
                 let mut result: String = String::new();
                 for subtask in &self.subtasks {
@@ -87,20 +90,24 @@ impl Task {
                 }
                 self.title
                     .clone()
-                    .with(to_crossterm_color(if self.state == TaskState::NonTask {
-                        (150, 150, 150)
+                    .with(if self.state == TaskState::NonTask {
+                        crossterm::style::Color::DarkGrey
                     } else {
-                        color
-                    }))
+                        to_crossterm_color(color)
+                    })
                     .to_string()
             },
             {
-                let mut result: String = String::new();
-                for subtask in &self.subtasks {
-                    result = result + "\n" + &subtask.render_screen_level(level + 1, color);
+                if self.is_collapsed {
+                    " ...".to_string()
+                } else {
+                    let mut result: String = String::new();
+                    for subtask in &self.subtasks {
+                        result = result + "\n" + &subtask.render_screen_level(level + 1, color);
+                    }
+                    result
                 }
-                result
-            }
+            },
         )
     }
 }

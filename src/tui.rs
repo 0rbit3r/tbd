@@ -25,6 +25,7 @@ pub fn run(task_file: TaskFile) -> io::Result<()> {
         let clear_to_end = format!("\n{esc}[0J", esc = 27 as char);
 
         let rendered_lines = tui.render_ui();
+        tui.message = None;
         let mut rendered_lines = rendered_lines.lines().collect::<Vec<_>>();
         rendered_lines.push(&clear_to_end);
         let rendered_lines = rendered_lines.join(&format!("\r\n{clear_line}"));
