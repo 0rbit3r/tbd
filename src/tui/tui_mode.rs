@@ -10,7 +10,7 @@ pub enum TuiMode {
 }
 
 impl Tui {
-    pub fn handle_input(&mut self, key_event: KeyEvent) {
+    pub fn handle_input(&mut self, key_event: KeyEvent) -> Option<()> {
         match self.mode {
             TuiMode::Normal => {
                 match key_event.code {
@@ -25,24 +25,23 @@ impl Tui {
                         }
                     }
                     KeyCode::PageUp => {
-                        if self.cursor == 0 {
-                            return;
-                        }
-                        if let MultiIndexRes::Found(mi) =
-                            index_to_multi_index(&self.task_file.tasks, self.cursor)
-                        {
-                            if mi.len() == 1 {
-                                if let IndexRes::Found(i) =
-                                    multi_index_to_index(&self.task_file.tasks, &[mi[0] - 1])
-                                {
-                                    self.cursor = i;
-                                }
-                            } else {
-                                if let IndexRes::Found(i) = multi_index_to_index(
-                                    &self.task_file.tasks,
-                                    &mi[0..mi.len() - 1],
-                                ) {
-                                    self.cursor = i;
+                        if self.cursor > 0 {
+                            if let MultiIndexRes::Found(mi) =
+                                index_to_multi_index(&self.task_file.tasks, self.cursor)
+                            {
+                                if mi.len() == 1 {
+                                    if let IndexRes::Found(i) =
+                                        multi_index_to_index(&self.task_file.tasks, &[mi[0] - 1])
+                                    {
+                                        self.cursor = i;
+                                    }
+                                } else {
+                                    if let IndexRes::Found(i) = multi_index_to_index(
+                                        &self.task_file.tasks,
+                                        &mi[0..mi.len() - 1],
+                                    ) {
+                                        self.cursor = i;
+                                    }
                                 }
                             }
                         }
@@ -110,7 +109,9 @@ impl Tui {
                         self.cursor += 1;
                         self.mode = TuiMode::Edit;
                     }
-                    _ => {}
+                    _ => {
+                        return None;
+                    }
                 }
             }
             TuiMode::Move => match key_event.code {
@@ -135,7 +136,9 @@ impl Tui {
                 KeyCode::Enter | KeyCode::Esc => {
                     self.mode = TuiMode::Normal;
                 }
-                _ => (),
+                _ => {
+                    return None;
+                }
             },
             TuiMode::Edit => match key_event.code {
                 KeyCode::Char(c) => {
@@ -153,8 +156,22 @@ impl Tui {
                 KeyCode::Enter | KeyCode::Esc => {
                     self.mode = TuiMode::Normal;
                 }
-                _ => {}
+                _ => {
+                    return None;
+                }
             },
+        }
+        Some(())
+    }
+
+    pub fn get_hint(&self) -> &str {
+        match self.mode {
+            TuiMode::Normal => {
+                "  ↓/↑/j/k: move cursor  ←/→/h/l: (un)indent task  PgUp/PgDn: jump up/down
+  s: save  q: quit  d: delete  a: add  i: edit  "
+            }
+            TuiMode::Edit => "  esc/enter: confirm",
+            TuiMode::Move => "  ↓/↑/j/k: move task  ←/→/h/l: (un)indent task",
         }
     }
 }

@@ -24,21 +24,21 @@ impl TaskState {
 
     pub fn decoration_color(&self, color: (u8, u8, u8)) -> String {
         match self {
-            TaskState::Untouched => "[ ]".grey().to_string(),
+            TaskState::Untouched => "[ ]".dark_grey().to_string(),
             TaskState::Started => {
-                "[".grey().to_string()
+                "[".dark_grey().to_string()
                     + &".".with(to_crossterm_color(color)).to_string()
-                    + &"]".grey().to_string()
+                    + &"]".dark_grey().to_string()
             }
             TaskState::Done => {
-                "[".grey().to_string()
+                "[".dark_grey().to_string()
                     + &"x".with(to_crossterm_color(color)).to_string()
-                    + &"]".grey().to_string()
+                    + &"]".dark_grey().to_string()
             }
             TaskState::Skipped => {
-                "[".grey().to_string()
+                "[".dark_grey().to_string()
                     + &"-".with(to_crossterm_color(color)).to_string()
-                    + &"]".grey().to_string()
+                    + &"]".dark_grey().to_string()
             }
             TaskState::NonTask => " \\_".dark_grey().to_string(),
         }

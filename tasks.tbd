@@ -17,7 +17,8 @@
     [x] move task
         [x] fix the moveup bug
         [ ] better move logic
-            Leave moveUp as is but add MovePageUp and Shift+moveUp?
+            Leave moveUp as is
+            but add shift+up as well
     [x] try NoTask instead of Malformed ("notes")
     [ ] collapsable tasks 
         [ ] Task.get_subtasks_or_collapsed()
@@ -25,7 +26,7 @@
     [x] open file
     [ ] proper arg parsing
     [ ] create new file
-[x] tui
+[x] basic tui     
     [x] > Arrow selector to highlight a task
     [x] move the arrow selector by redrawing
     [x] create
@@ -39,10 +40,12 @@
     [ ] cursor-based edit (and delete)
 [ ] better tui
     [x] colors 
-    [ ] flicker
+    [.] flicker
     [ ] mouse support
     [ ] hide done/skipped
     [ ] scroll
     [ ] border
     [ ] hints
-[ ] publish on crates.io
+[x] publish on crates.io
+[ ] bugs        
+    [ ] word-wrap breaks things

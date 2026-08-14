@@ -55,6 +55,10 @@ impl Tui {
         } else {
             ""
         };
-        format!("\n\n  mode: {mode}   {message}\n",)
+        let hint = &self.get_hint().dark_grey().to_string();
+        format!(
+            "\n\n  {mode_label} {mode}   {message}\n{hint}",
+            mode_label = "mode:".dark_grey().to_string()
+        )
     }
 }

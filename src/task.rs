@@ -79,14 +79,22 @@ impl Task {
                 let mut with_space = self.state.decoration_color(color).to_string();
                 with_space += " ";
                 with_space
-            },{
-            let mut color = color;
-            for _ in 0..level {color = get_lighter(color);}
-            self.title
-                .clone()
-                .with(to_crossterm_color(if self.state == TaskState::NonTask {(150,150,150)} else {color}))
-                .to_string()
-            },{
+            },
+            {
+                let mut color = color;
+                for _ in 0..level {
+                    color = get_lighter(color);
+                }
+                self.title
+                    .clone()
+                    .with(to_crossterm_color(if self.state == TaskState::NonTask {
+                        (150, 150, 150)
+                    } else {
+                        color
+                    }))
+                    .to_string()
+            },
+            {
                 let mut result: String = String::new();
                 for subtask in &self.subtasks {
                     result = result + "\n" + &subtask.render_screen_level(level + 1, color);
