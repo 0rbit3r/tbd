@@ -2,6 +2,7 @@ mod get_task;
 mod indentation;
 mod indexing;
 mod insert;
+mod move_task;
 mod parse;
 mod remove;
 
@@ -20,27 +21,27 @@ use std::error::Error;
 use std::fs;
 
 pub struct TaskFile {
-    pub path: Option<String>,
+    pub path: String,
     pub tasks: Vec<Task>,
 }
 
 impl TaskFile {
-    pub fn new() -> TaskFile {
+    pub fn new(path: &str) -> TaskFile {
         TaskFile {
-            path: None,
+            path: path.to_string(),
             tasks: vec![],
         }
     }
 
     pub fn from_file(file_path: &str) -> Result<TaskFile, Box<dyn Error>> {
         let content = fs::read_to_string(file_path)?;
-        let mut file = TaskFile::from_string(&content).ok_or("Failed to parse file.")?;
-        file.path = Some(file_path.to_string());
+        let mut file = TaskFile::from_string(file_path, &content).ok_or("Failed to parse file.")?;
+        file.path = file_path.to_string();
 
         Ok(file)
     }
 
-    pub fn from_string(content: &str) -> Option<TaskFile> {
+    pub fn from_string(path: &str, content: &str) -> Option<TaskFile> {
         //Use result instead
 
         let lines = content.lines();
@@ -52,16 +53,9 @@ impl TaskFile {
         }
 
         Some(TaskFile {
-            path: None,
+            path: path.to_string(),
             tasks: result,
         })
-    }
-
-    /// Saves the task file as a new file - will overwrite the path property
-    pub fn save_as(&mut self, path: &str) -> Result<(), Box<dyn Error>> {
-        self.path = Some(path.to_string());
-
-        self.save_file()
     }
 
     pub fn render_file(&self) -> String {
@@ -74,13 +68,9 @@ impl TaskFile {
 
     /// Saves file into the path defined on the TaskFile or returns None
     pub fn save_file(&self) -> Result<(), Box<dyn Error>> {
-        match &self.path {
-            None => return Err("This task-file has no file associated. Use save_as.".into()),
-            Some(path) => {
-                let content = self.render_file();
-                fs::write(path, content)?;
-            }
-        }
+        let content = self.render_file();
+        fs::write(&self.path, content)?;
+
         Ok(())
     }
 
@@ -88,6 +78,10 @@ impl TaskFile {
     // - either as a sibling when the task at index has no subtasks or as subtask otherwise
     // None index will push new top-level task to the end
     pub fn insert_task(&mut self, new_task: Task, index: Option<usize>) -> Option<()> {
+        if self.tasks_count() == 0 {
+            self.tasks.push(new_task);
+            return Some(());
+        }
         match index {
             None => {
                 self.tasks.push(new_task);
@@ -120,12 +114,12 @@ impl TaskFile {
 
     /// # Examples
     /// ```
-    /// let mut task_file = tbd::TaskFile::from_string("[ ] Untouched").unwrap();
+    /// let mut task_file = tbd::TaskFile::from_string("tasks","[ ] Untouched").unwrap();
     /// task_file.mark_as(0, tbd::TaskState::Done);
     /// assert_eq!(tbd::TaskState::Done, task_file.tasks[0].state);
     /// ```
     /// ```
-    /// let mut task_file = tbd::TaskFile::from_string("[ ] Untouched").unwrap();
+    /// let mut task_file = tbd::TaskFile::from_string("tasks", "[ ] Untouched").unwrap();
     /// assert_eq!(None, task_file.mark_as(1, tbd::TaskState::Done));
     /// ```
     pub fn mark_as(&mut self, index: usize, new_state: TaskState) -> Option<()> {
@@ -164,36 +158,7 @@ impl TaskFile {
         };
         remove_task_r(&mut self.tasks, &index)
     }
-
-    pub fn move_task_up(&mut self, index: usize) -> Option<()> {
-        if index < 1 {
-            return None;
-        }
-        if let Some(task) = self.remove_task(index) {
-            if index == 1 {
-                self.tasks.insert(0, task);
-            } else {
-                self.insert_task(task, Some(index - 2));
-            }
-        };
-        Some(())
-    }
-    pub fn move_task_down(&mut self, index: usize) -> Option<()> {
-        // if index > tasks_count {
-        //     return None;
-        // } todo - get_size
-        if let Some(task) = self.remove_task(index) {
-            self.insert_task(task, Some(index));
-        };
-        Some(())
-    }
     pub fn tasks_count(&self) -> usize {
         self.tasks.iter().map(|t| t.get_count()).sum()
-    }
-}
-
-impl Default for TaskFile {
-    fn default() -> TaskFile {
-        Self::new()
     }
 }

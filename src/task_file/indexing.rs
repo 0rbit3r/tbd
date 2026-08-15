@@ -72,7 +72,7 @@ mod test {
 
     #[test]
     fn flat_list_happy() {
-        let task_file = TaskFile::from_string(
+        let task_file = TaskFile::from_string("path",
             "[ ] task A
 [ ] task B
 [ ] task C",
@@ -94,7 +94,7 @@ mod test {
 
     #[test]
     fn flat_list_sad() {
-        let task_file = TaskFile::from_string(
+        let task_file = TaskFile::from_string("path",
             "[ ] task A
 [ ] task B
 [ ] task C",
@@ -113,7 +113,7 @@ mod test {
 
     #[test]
     fn nested_list_happy() {
-        let task_file = TaskFile::from_string(
+        let task_file = TaskFile::from_string("path",
             "[ ] task A
     [ ] Nested task 1
     [ ] Nested task 2
@@ -123,7 +123,11 @@ mod test {
         [ ] Second double nested
             [ ] Triple nested:-o
 [ ] task C
-    [ ] C's child",
+    [ ] collapsed ...
+        [ ] should not be  accessible
+        [ ] should not be  accessible
+    [ ] socond collapsed ...
+        [ ] should not be  accessible",
         )
         .expect("this string should be parsed");
 
@@ -138,6 +142,7 @@ mod test {
             (7, vec![0, 2, 0, 0]),
             (8, vec![1]),
             (9, vec![1, 0]),
+            (10, vec![1, 1]),
         ];
         for variation in variations {
             match index_to_multi_index(&task_file.tasks, variation.0) {

@@ -40,7 +40,7 @@ mod test {
 
     #[test]
     fn indent_simple_file() {
-        let mut task_file = TaskFile::from_string(
+        let mut task_file = TaskFile::from_string("path",
             "[ ] A
 [ ] B
 [ ] C",
@@ -63,7 +63,7 @@ mod test {
 
     #[test]
     fn unindent_simple_file() {
-        let mut task_file = TaskFile::from_string(
+        let mut task_file = TaskFile::from_string("path",
             "[ ] A
     [ ] B
         [ ] C",
@@ -82,7 +82,7 @@ mod test {
 
     #[test]
     fn unindent_file() {
-        let mut task_file = TaskFile::from_string(
+        let mut task_file = TaskFile::from_string("path",
             "[ ] A
     [ ] B
     [ ] C",
@@ -100,7 +100,7 @@ mod test {
 
     #[test]
     fn unindent_one() {
-        let mut task_file = TaskFile::from_string(
+        let mut task_file = TaskFile::from_string("path",
             "[ ] A
     [ ] B
         [ ] C
@@ -126,7 +126,7 @@ mod test {
 
     #[test]
     fn unindent_block_in_subtask() {
-        let mut task_file = TaskFile::from_string(
+        let mut task_file = TaskFile::from_string("path",
             "[ ] A
     [ ] B
         [ ] C

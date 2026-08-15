@@ -28,7 +28,7 @@ mod test {
 
     #[test]
     fn get_task_happy() {
-        let mut task_file = TaskFile::from_string(
+        let mut task_file = TaskFile::from_string("path",
             "[ ] Un
 [x] Do
     [ ] Do1

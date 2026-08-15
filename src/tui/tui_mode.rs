@@ -25,23 +25,22 @@ impl Tui {
                         }
                     }
                     KeyCode::PageUp => {
-                        if self.cursor > 0 {
-                            if let MultiIndexRes::Found(mi) =
+                        if self.cursor > 0
+                            && let MultiIndexRes::Found(mi) =
                                 index_to_multi_index(&self.task_file.tasks, self.cursor)
-                            {
-                                if mi.len() == 1 {
-                                    if let IndexRes::Found(i) =
-                                        multi_index_to_index(&self.task_file.tasks, &[mi[0] - 1])
-                                    {
-                                        self.cursor = i;
-                                    }
-                                } else {
-                                    if let IndexRes::Found(i) = multi_index_to_index(
-                                        &self.task_file.tasks,
-                                        &mi[0..mi.len() - 1],
-                                    ) {
-                                        self.cursor = i;
-                                    }
+                        {
+                            if mi.len() == 1 {
+                                if let IndexRes::Found(i) =
+                                    multi_index_to_index(&self.task_file.tasks, &[mi[0] - 1])
+                                {
+                                    self.cursor = i;
+                                }
+                            } else {
+                                if let IndexRes::Found(i) = multi_index_to_index(
+                                    &self.task_file.tasks,
+                                    &mi[0..mi.len() - 1],
+                                ) {
+                                    self.cursor = i;
                                 }
                             }
                         }
@@ -97,6 +96,9 @@ impl Tui {
                     }
                     KeyCode::Char('d') => {
                         self.task_file.remove_task(self.cursor);
+                        if self.task_file.tasks_count() > 0 {
+                            self.cursor -= 1;
+                        }
                     }
                     KeyCode::Char('m') => {
                         self.mode = TuiMode::Move;
@@ -106,11 +108,13 @@ impl Tui {
                     }
                     KeyCode::Char('a') => {
                         self.task_file.insert_task(Task::new(), Some(self.cursor));
-                        self.cursor += 1;
+                        if self.task_file.tasks_count() > 1{   
+                            self.cursor += 1;
+                        }
                         self.mode = TuiMode::Edit;
                     }
                     KeyCode::Char('c') => {
-                        if let Some(task) = self.task_file.get_task_at_mut(self.cursor){
+                        if let Some(task) = self.task_file.get_task_at_mut(self.cursor) {
                             task.is_collapsed = !task.is_collapsed;
                         }
                     }

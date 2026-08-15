@@ -84,7 +84,7 @@ gibberish"
     #[test]
     fn parse_shallow() {
         let task_file =
-            TaskFile::from_string(get_shallow_tasks_str()).expect("This content is parseable");
+            TaskFile::from_string("path",get_shallow_tasks_str()).expect("This content is parseable");
         let expected = vec![
             Task {
                 state: TaskState::Untouched,
@@ -125,7 +125,7 @@ gibberish"
     #[test]
     fn parse_nested() {
         let task_file =
-            TaskFile::from_string(get_nested_tasks_str()).expect("This content is parseable");
+            TaskFile::from_string("path",get_nested_tasks_str()).expect("This content is parseable");
         let expected = vec![
             Task {
                 state: TaskState::Untouched,
@@ -215,7 +215,7 @@ gibberish"
     #[test]
     fn parse_and_render_mostly_equal() {
         let task_file =
-            TaskFile::from_string(get_nested_tasks_str()).expect("content is parseable");
+            TaskFile::from_string("path",get_nested_tasks_str()).expect("content is parseable");
         let rendered = task_file.render_file();
         assert_eq!(get_nested_tasks_str(), rendered)
     }

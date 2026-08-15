@@ -29,17 +29,15 @@ impl Tui {
     }
 
     fn render_header(&self) -> String {
-        let title = match &self.task_file.path {
-            None => "    new file",
-            Some(f) => f
+        let title = &&self.task_file.path
                 .split("/")
                 .last()
                 .map(|s| s.trim_end_matches(".tbd"))
-                .unwrap_or("    no file"),
-        };
+                .unwrap_or("    no file");  
+        
         format!(
-            "        {title}\n----{} to be done -\n\n",
-            "-".repeat(title.len() + 4)
+            "        {title}\n⎯⎯⎯⎯{} to be done ⎯\n\n",
+            "⎯".repeat(title.len() + 4)
         )
     }
 
@@ -58,7 +56,7 @@ impl Tui {
         let hint = &self.get_hint().dark_grey().to_string();
         format!(
             "\n\n  {mode_label} {mode}   {message}\n{hint}",
-            mode_label = "mode:".dark_grey().to_string()
+            mode_label = "mode:".dark_grey()
         )
     }
 }

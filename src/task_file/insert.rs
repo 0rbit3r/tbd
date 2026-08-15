@@ -13,7 +13,7 @@ pub fn insert_task_to_task_tree(
             task_list.push(task);
             return Some(());
         }
-        if task_list[multi_index[0]].subtasks.is_empty() {
+        if task_list[multi_index[0]].subtasks.is_empty() || task_list[multi_index[0]].is_collapsed {
             task_list.insert(multi_index[0] + 1, task);
         } else {
             task_list[multi_index[0]].subtasks.insert(0, task);
@@ -40,6 +40,7 @@ mod test {
     #[test]
     fn test_high_index_insert_returns_none() {
         let mut task_file = TaskFile::from_string(
+            "path",
             "[ ] U
 [x] D
 [.] S
@@ -49,7 +50,8 @@ mod test {
         let inserted_task = Task {
             state: TaskState::Done,
             title: "NEW".to_string(),
-            subtasks: vec![],is_collapsed: false,
+            subtasks: vec![],
+            is_collapsed: false,
         };
 
         let insert_result = task_file.insert_task(inserted_task, Some(69));
@@ -61,11 +63,12 @@ mod test {
 
     #[test]
     fn insert_to_empty_task_file() {
-        let mut task_file = TaskFile::new();
+        let mut task_file = TaskFile::new("path");
         let inserted_task = Task {
             state: TaskState::Done,
             title: "NEW".to_string(),
-            subtasks: vec![],is_collapsed: false,
+            subtasks: vec![],
+            is_collapsed: false,
         };
 
         let insert_result = task_file.insert_task(inserted_task, None);
@@ -86,9 +89,11 @@ mod test {
             let inserted_task = Task {
                 state: TaskState::Done,
                 title: title.to_string(),
-                subtasks: vec![],is_collapsed: false,
+                subtasks: vec![],
+                is_collapsed: false,
             };
             let mut task_file = TaskFile::from_string(
+                "path",
                 "[ ] U
     [ ] U1
     [ ] U2
@@ -118,6 +123,53 @@ mod test {
             expected_line += "[x] NEW";
 
             assert_eq!(expected_line, line);
+        }
+    }
+
+    #[test]
+    fn test_insert_with_collapsed() {
+        let title = "NEW";
+        let variations: Vec<(usize, i32, usize)> = // index and expected index in
+        vec![(0, 1, 1), (1, 1, 2), (2, 1, 5), (3, 0, 6),];
+
+        for (index, indents, final_pos) in variations {
+            let inserted_task = Task {
+                state: TaskState::Done,
+                title: title.to_string(),
+                subtasks: vec![],
+                is_collapsed: false,
+            };
+            let mut task_file = TaskFile::from_string(
+                "path",
+                "[ ] U
+    [ ] U1
+    [ ] U2 ...
+        [ ] U21
+        [ ] U22
+[x] D
+[.] S
+[-] N",
+            )
+            .expect("parsable tasks");
+
+            task_file.insert_task(inserted_task, Some(index));
+            let rendered = task_file.render_file();
+
+            let line = rendered
+                .lines()
+                .skip(final_pos)
+                .next()
+                .expect("index exists");
+            let mut expected_line = String::new();
+            if indents > 0 {
+                expected_line = (0..indents)
+                    .map(|_| "    ")
+                    .fold("".to_string(), |a, b| a + b)
+            }
+
+            expected_line += "[x] NEW";
+
+            assert_eq!(expected_line, line, "index: {}", index);
         }
     }
 }
