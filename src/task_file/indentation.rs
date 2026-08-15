@@ -7,6 +7,7 @@ pub fn indent_task_r(task_list: &mut Vec<Task>, index: &[usize]) -> Option<()> {
         };
         let moved_task = remove_task_r(task_list, index)?;
         task_list[index[0] - 1].subtasks.push(moved_task);
+        task_list[index[0] - 1].is_collapsed = false;
         Some(())
     } else {
         indent_task_r(&mut task_list[index[0]].subtasks, &index[1..])
@@ -148,5 +149,32 @@ mod test {
 [ ] G",
             task_file.render_file()
         );
+    }
+
+        #[test]
+    fn indent_under_collapsed() {
+        let mut task_file = TaskFile::from_string("path",
+            "[ ] A ...
+    [ ] B
+        [ ] C
+    [ ] D
+        [ ] E
+        [ ] F
+[ ] G",
+        )
+        .expect("parseable string");
+
+        assert!(task_file.indent_task(1).is_some());
+        assert_eq!(
+            "[ ] A
+    [ ] B
+        [ ] C
+    [ ] D
+        [ ] E
+        [ ] F
+    [ ] G",
+            task_file.render_file()
+        );
+        assert!(!task_file.get_task_at(0).unwrap().is_collapsed)
     }
 }

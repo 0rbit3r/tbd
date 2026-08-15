@@ -17,7 +17,6 @@
     [x] move task
         [x] fix the moveup bug
     [x] try NoTask instead of Malformed ("notes")
-[x] publish on crates.io
 [x] basic tui      ...
     [x] > Arrow selector to highlight a task
     [x] move the arrow selector by redrawing
@@ -28,25 +27,32 @@
     [x] save
     [x] pgup and down
     [x] remove
-[.] cli
+[x] publish on crates.io
+[x] collapsable tasks  ...
+    [x] Task.get_subtasks_or_collapsed()
+    [x] moving through collapsed
+[x] cli ...
     [x] open file
-    [ ] proper arg parsing
-    [ ] create new file
+    [x] proper arg parsing
+    [x] create new file
 [.] better tui
     [x] colors 
+    [x] hints
+    [x] hide done/skipped
+        (collapsing)
     [.] flicker
-    [ ] mouse support
-    [ ] hide done/skipped
     [ ] scroll
-    [ ] border
-    [ ] hints
-[ ] cursor-based edit (and delete) 
-[ ] better move logic
-    Leave moveUp as is
-    but add shift+up as well
-[ ] bugs        
+    [ ] border ??
+    [ ] mouse support
+    [ ] 'it is done' label in header
+[ ] toggle hints on '?'
+[ ] better controls 
+    [ ] quick move
+        Leave moveUp as is
+        but add shift+up as well
+    [ ] quick mark (x, -, nontask etc.)
+[ ] cursor-based edit (and delete)  
+[.] bugs        
     [ ] word-wrap breaks things
-    [ ] move last down bug
-[ ] collapsable tasks 
-    [x] Task.get_subtasks_or_collapsed()
-    [ ] moving through collapsed
+    [x] move last down bug
+    [x] indent task under collapsed

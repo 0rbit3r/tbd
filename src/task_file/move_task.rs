@@ -15,7 +15,8 @@ impl TaskFile {
         Some(())
     }
     pub fn move_task_down(&mut self, index: usize) -> Option<()> {
-        if index >= self.tasks_count() - 1 {
+        let last_task_size = self.get_task_at(index).map(|t| t.get_count()).unwrap_or(1);
+        if index == self.tasks_count() - last_task_size {
             return None;
         }
         if let Some(task) = self.remove_task(index) {
@@ -27,7 +28,7 @@ impl TaskFile {
 
 #[cfg(test)]
 mod test {
-    use crate::TaskFile;
+    use crate::{Task, TaskFile};
 
     const FILE: &str = "[ ] simple 1
 [ ] simple 2
@@ -75,5 +76,16 @@ mod test {
         let mut file = TaskFile::from_string("path", FILE).unwrap();
         assert!(file.move_task_up(0).is_none());
         assert!(file.move_task_down(6).is_none());
+    }
+
+    #[test]
+    fn move_last_task() {
+        let mut file = TaskFile::from_string("path", FILE).unwrap();
+        assert!(file.move_task_down(6).is_none()); // cannot move down last 
+        file.insert_task(Task::new(), None);
+        file.indent_task(7);
+        assert!(file.move_task_down(6).is_none()); // even when it has children
+        file.indent_task(6);// this should uncollapse the sibling a line up
+        assert!(file.move_task_down(8).is_none()); // even when it is a child itself
     }
 }

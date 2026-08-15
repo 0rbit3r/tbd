@@ -7,8 +7,8 @@ mod parse;
 mod remove;
 
 use crate::task_state::TaskState;
-use get_task::get_task;
-use get_task::get_task_mut;
+use get_task::get_task_mut_r;
+use get_task::get_task_r;
 use indentation::indent_task_r;
 use indentation::unindent_task_r;
 use remove::remove_task_r;
@@ -23,6 +23,7 @@ use std::fs;
 pub struct TaskFile {
     pub path: String,
     pub tasks: Vec<Task>,
+    pub saved: bool,
 }
 
 impl TaskFile {
@@ -30,14 +31,14 @@ impl TaskFile {
         TaskFile {
             path: path.to_string(),
             tasks: vec![],
+            saved: false,
         }
     }
 
     pub fn from_file(file_path: &str) -> Result<TaskFile, Box<dyn Error>> {
         let content = fs::read_to_string(file_path)?;
         let mut file = TaskFile::from_string(file_path, &content).ok_or("Failed to parse file.")?;
-        file.path = file_path.to_string();
-
+        file.saved = true;
         Ok(file)
     }
 
@@ -55,6 +56,7 @@ impl TaskFile {
         Some(TaskFile {
             path: path.to_string(),
             tasks: result,
+            saved: false,
         })
     }
 
@@ -67,10 +69,10 @@ impl TaskFile {
     }
 
     /// Saves file into the path defined on the TaskFile or returns None
-    pub fn save_file(&self) -> Result<(), Box<dyn Error>> {
+    pub fn save_file(&mut self) -> Result<(), Box<dyn Error>> {
         let content = self.render_file();
         fs::write(&self.path, content)?;
-
+        self.saved = true;
         Ok(())
     }
 
@@ -80,17 +82,19 @@ impl TaskFile {
     pub fn insert_task(&mut self, new_task: Task, index: Option<usize>) -> Option<()> {
         if self.tasks_count() == 0 {
             self.tasks.push(new_task);
+            self.saved = false;
             return Some(());
         }
         match index {
             None => {
                 self.tasks.push(new_task);
+                self.saved = false;
                 Some(())
             }
             Some(i) => match index_to_multi_index(&self.tasks, i) {
                 MultiIndexRes::NotFound(_) => None,
                 MultiIndexRes::Found(multi_index) => {
-                    insert_task_to_task_tree(&mut self.tasks, new_task, &multi_index)
+                    insert_task_to_task_tree_r(&mut self.tasks, new_task, &multi_index)
                 }
             },
         }
@@ -101,7 +105,7 @@ impl TaskFile {
             MultiIndexRes::Found(mi) => mi,
             MultiIndexRes::NotFound(_) => return None,
         };
-        get_task(&self.tasks, &index)
+        get_task_r(&self.tasks, &index)
     }
 
     pub fn get_task_at_mut(&mut self, index: usize) -> Option<&mut Task> {
@@ -109,7 +113,13 @@ impl TaskFile {
             MultiIndexRes::Found(mi) => mi,
             MultiIndexRes::NotFound(_) => return None,
         };
-        get_task_mut(&mut self.tasks, &index)
+
+        if let Some(t) = get_task_mut_r(&mut self.tasks, &index) {
+            self.saved = false;
+            Some(t)
+        } else {
+            None
+        }
     }
 
     /// # Examples
@@ -136,7 +146,12 @@ impl TaskFile {
             MultiIndexRes::Found(mi) => mi,
             MultiIndexRes::NotFound(_) => return None,
         };
-        indent_task_r(&mut self.tasks, &index)
+        if let Some(()) = indent_task_r(&mut self.tasks, &index) {
+            self.saved = false;
+            Some(())
+        } else {
+            None
+        }
     }
 
     ///returns how many lines down the task traveled
@@ -148,7 +163,13 @@ impl TaskFile {
             MultiIndexRes::Found(mi) => mi,
             MultiIndexRes::NotFound(_) => return None,
         };
-        unindent_task_r(&mut self.tasks, &index)
+
+        if let Some(s) = unindent_task_r(&mut self.tasks, &index) {
+            self.saved = false;
+            Some(s)
+        } else {
+            None
+        }
     }
 
     pub fn remove_task(&mut self, index: usize) -> Option<Task> {
@@ -156,8 +177,15 @@ impl TaskFile {
             MultiIndexRes::Found(mi) => mi,
             MultiIndexRes::NotFound(_) => return None,
         };
-        remove_task_r(&mut self.tasks, &index)
+
+        if let Some(t) = remove_task_r(&mut self.tasks, &index) {
+            self.saved = false;
+            Some(t)
+        } else {
+            None
+        }
     }
+
     pub fn tasks_count(&self) -> usize {
         self.tasks.iter().map(|t| t.get_count()).sum()
     }

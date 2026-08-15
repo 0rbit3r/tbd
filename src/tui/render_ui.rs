@@ -29,16 +29,25 @@ impl Tui {
     }
 
     fn render_header(&self) -> String {
-        let title = &&self.task_file.path
-                .split("/")
-                .last()
-                .map(|s| s.trim_end_matches(".tbd"))
-                .unwrap_or("    no file");  
-        
-        format!(
-            "        {title}\n⎯⎯⎯⎯{} to be done ⎯\n\n",
-            "⎯".repeat(title.len() + 4)
-        )
+        let title = &&self
+            .task_file
+            .path
+            .split("/")
+            .last()
+            .map(|s| s.trim_end_matches(".tbd"))
+            .unwrap_or("    no file");
+
+        let mut string = String::new();
+        string += &format!("        {title}\n");
+        string += &"⎯⎯⎯⎯".dark_grey().to_string();
+        string += &"⎯".dark_grey().to_string().repeat(title.len() + 4);
+        string += &if self.task_file.saved {
+            " to be done ".dark_grey().to_string()
+        } else {
+            " not saved! ".yellow().to_string()
+        };
+        string += &"⎯\n\n".dark_grey().to_string();
+        string
     }
 
     fn render_footer(&self) -> String {

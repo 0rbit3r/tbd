@@ -48,7 +48,7 @@ struct Tui {
     task_file: TaskFile,
     cursor: usize,
     mode: TuiMode,
-    message: Option<String>,
+    message: Option<String>
 }
 
 impl Tui {

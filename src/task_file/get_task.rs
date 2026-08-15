@@ -1,24 +1,24 @@
 use crate::task::Task;
 
-pub fn get_task<'a>(task_list: &'a [Task], index: &[usize]) -> Option<&'a Task> {
+pub fn get_task_r<'a>(task_list: &'a [Task], index: &[usize]) -> Option<&'a Task> {
     if task_list.is_empty() || task_list.len() <= index[0] {
         return None;
     };
     if index.len() == 1 {
         Some(&task_list[index[0]])
     } else {
-        get_task(&task_list[index[0]].subtasks, &index[1..])
+        get_task_r(&task_list[index[0]].subtasks, &index[1..])
     }
 }
 
-pub fn get_task_mut<'a>(task_list: &'a mut [Task], index: &[usize]) -> Option<&'a mut Task> {
+pub fn get_task_mut_r<'a>(task_list: &'a mut [Task], index: &[usize]) -> Option<&'a mut Task> {
     if task_list.is_empty() || task_list.len() <= index[0] {
         return None;
     };
     if index.len() == 1 {
         Some(&mut task_list[index[0]])
     } else {
-        get_task_mut(&mut task_list[index[0]].subtasks, &index[1..])
+        get_task_mut_r(&mut task_list[index[0]].subtasks, &index[1..])
     }
 }
 

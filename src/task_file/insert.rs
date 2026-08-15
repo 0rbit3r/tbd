@@ -1,6 +1,6 @@
 use crate::task::Task;
 
-pub fn insert_task_to_task_tree(
+pub fn insert_task_to_task_tree_r(
     task_list: &mut Vec<Task>,
     task: Task,
     multi_index: &[usize],
@@ -25,7 +25,7 @@ pub fn insert_task_to_task_tree(
         None => task_list.push(task),
         Some((first_index, rest_of_indexes)) => match task_list.get_mut(*first_index) {
             Some(subtask) => {
-                return insert_task_to_task_tree(&mut subtask.subtasks, task, rest_of_indexes);
+                return insert_task_to_task_tree_r(&mut subtask.subtasks, task, rest_of_indexes);
             }
             None => {
                 return None;
