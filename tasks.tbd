@@ -46,6 +46,7 @@
     but add shift+up as well
 [ ] bugs        
     [ ] word-wrap breaks things
+    [ ] move last down bug
 [ ] collapsable tasks 
     [x] Task.get_subtasks_or_collapsed()
     [ ] moving through collapsed

@@ -32,7 +32,7 @@ pub fn run(task_file: TaskFile) -> io::Result<()> {
             && tui.handle_input(key_event).is_none()
         {
             match key_event.code {
-                KeyCode::Char('q') => break,
+                KeyCode::Char('Q') => break,
                 KeyCode::Char('c') if key_event.modifiers.contains(KeyModifiers::CONTROL) => {
                     break;
                 }

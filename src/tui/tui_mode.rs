@@ -87,14 +87,14 @@ impl Tui {
                             }
                         }
                     }
-                    KeyCode::Char('s') => {
+                    KeyCode::Char('S') => {
                         self.message = match self.task_file.save_file() {
                             Ok(_) => Some("file saved".to_owned()),
                             Err(_) => Some("failed to save file".to_string()),
                         }
                         //todo - return errors and display here
                     }
-                    KeyCode::Char('d') => {
+                    KeyCode::Char('D') => {
                         self.task_file.remove_task(self.cursor);
                         if self.task_file.tasks_count() > 0 {
                             self.cursor -= 1;
@@ -178,12 +178,15 @@ impl Tui {
             TuiMode::Normal => {
                 "
   ↓/↑/j/k: move cursor   PgUp/PgDn: move faster
-  ←/→/h/l: (un)indent    c: toggle collapsed
-  s: save    q: quit     d: delete    a: add
-  i: edit"
+  ←/→/h/l: indentation
+  i: edit    a: add      c: toggle collapsed
+  S: save    Q: quit     D: delete"
             }
-            TuiMode::Edit => "  esc/enter: confirm",
-            TuiMode::Move => "  ↓/↑/j/k: move task  ←/→/h/l: (un)indent task",
+            TuiMode::Edit => "
+  esc/enter: confirm",
+            TuiMode::Move => "
+  ↓/↑/j/k:   move task  ←/→/h/l: indentation
+  esc/enter: confirm",
         }
     }
 }
