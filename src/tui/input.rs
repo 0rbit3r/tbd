@@ -1,9 +1,9 @@
 use crate::tui::Tui;
-use crossterm::event::{KeyCode, KeyEvent};
+use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use tbd::task_file::{IndexRes, MultiIndexRes, index_to_multi_index, multi_index_to_index};
 use tbd::{Task, TaskState};
 
-pub enum TuiMode {
+pub enum TuiInputMode {
     Normal,
     Edit,
     Move,
@@ -12,8 +12,24 @@ pub enum TuiMode {
 impl Tui {
     pub fn handle_input(&mut self, key_event: KeyEvent) -> Option<()> {
         match self.mode {
-            TuiMode::Normal => {
+            TuiInputMode::Normal => {
                 match key_event.code {
+                    KeyCode::Char('J') | KeyCode::Down
+                        if key_event.modifiers.contains(KeyModifiers::SHIFT) =>
+                    {
+                        let steps = (self.task_file.tasks_count() - self.cursor - 1).min(5);
+                        if steps > 0 {
+                            self.cursor += steps;
+                        }
+                    }
+                    KeyCode::Char('K') | KeyCode::Up
+                        if key_event.modifiers.contains(KeyModifiers::SHIFT) =>
+                    {
+                        let steps = (self.cursor).min(5);
+                        if steps > 0 {
+                            self.cursor -= steps;
+                        }
+                    }
                     KeyCode::Char('j') | KeyCode::Down => {
                         if self.task_file.tasks_count() > self.cursor + 1 {
                             self.cursor += 1;
@@ -82,7 +98,6 @@ impl Tui {
                                 TaskState::Untouched => TaskState::Started,
                                 TaskState::Started => TaskState::Done,
                                 TaskState::Done => TaskState::Skipped,
-                                TaskState::Skipped => TaskState::NonTask,
                                 _ => TaskState::Untouched,
                             }
                         }
@@ -101,21 +116,41 @@ impl Tui {
                         }
                     }
                     KeyCode::Char('m') => {
-                        self.mode = TuiMode::Move;
+                        self.mode = TuiInputMode::Move;
                     }
                     KeyCode::Char('i') => {
-                        self.mode = TuiMode::Edit;
+                        self.mode = TuiInputMode::Edit;
                     }
                     KeyCode::Char('a') => {
                         self.task_file.insert_task(Task::new(), Some(self.cursor));
-                        if self.task_file.tasks_count() > 1{   
+                        if self.task_file.tasks_count() > 1 {
                             self.cursor += 1;
                         }
-                        self.mode = TuiMode::Edit;
+                        self.mode = TuiInputMode::Edit;
                     }
-                    KeyCode::Char('c') => {
+                    KeyCode::Char('f') => {
                         if let Some(task) = self.task_file.get_task_at_mut(self.cursor) {
                             task.is_collapsed = !task.is_collapsed;
+                        }
+                    }
+                    KeyCode::Char('x') => {
+                        if let Some(task) = self.task_file.get_task_at_mut(self.cursor) {
+                            task.state = TaskState::Done;
+                        }
+                    }
+                    KeyCode::Char('.') => {
+                        if let Some(task) = self.task_file.get_task_at_mut(self.cursor) {
+                            task.state = TaskState::Started;
+                        }
+                    }
+                    KeyCode::Char('-') => {
+                        if let Some(task) = self.task_file.get_task_at_mut(self.cursor) {
+                            task.state = TaskState::Skipped;
+                        }
+                    }
+                    KeyCode::Char('n') => {
+                        if let Some(task) = self.task_file.get_task_at_mut(self.cursor) {
+                            task.state = TaskState::NonTask;
                         }
                     }
                     _ => {
@@ -123,7 +158,7 @@ impl Tui {
                     }
                 }
             }
-            TuiMode::Move => match key_event.code {
+            TuiInputMode::Move => match key_event.code {
                 KeyCode::Char('j') | KeyCode::Down => {
                     if self.task_file.move_task_down(self.cursor).is_some() {
                         self.cursor += 1;
@@ -143,13 +178,13 @@ impl Tui {
                     }
                 }
                 KeyCode::Enter | KeyCode::Esc => {
-                    self.mode = TuiMode::Normal;
+                    self.mode = TuiInputMode::Normal;
                 }
                 _ => {
                     return None;
                 }
             },
-            TuiMode::Edit => match key_event.code {
+            TuiInputMode::Edit => match key_event.code {
                 KeyCode::Char(c) => {
                     if let Some(task) = self.task_file.get_task_at_mut(self.cursor) {
                         task.title.push(c);
@@ -163,7 +198,7 @@ impl Tui {
                     }
                 }
                 KeyCode::Enter | KeyCode::Esc => {
-                    self.mode = TuiMode::Normal;
+                    self.mode = TuiInputMode::Normal;
                 }
                 _ => {
                     return None;
@@ -175,18 +210,24 @@ impl Tui {
 
     pub fn get_hint(&self) -> &str {
         match self.mode {
-            TuiMode::Normal => {
+            TuiInputMode::Normal => {
                 "
   ↓/↑/j/k: move cursor   PgUp/PgDn: move faster
-  ←/→/h/l: indentation
-  i: edit    a: add      c: toggle collapsed
-  S: save    Q: quit     D: delete"
+  ←/→/h/l: indentation       space: cycle states
+  i: edit      a: add       f: toggle fold
+  S: save      Q: quit      D: delete
+  [x] [.] [-] : set state n: toggle note"
+  
             }
-            TuiMode::Edit => "
-  esc/enter: confirm",
-            TuiMode::Move => "
+            TuiInputMode::Edit => {
+                "
+  esc/enter: confirm"
+            }
+            TuiInputMode::Move => {
+                "
   ↓/↑/j/k:   move task  ←/→/h/l: indentation
-  esc/enter: confirm",
+  esc/enter: confirm"
+            }
         }
     }
 }

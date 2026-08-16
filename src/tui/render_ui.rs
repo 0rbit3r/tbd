@@ -1,7 +1,7 @@
 use crossterm::style::Stylize;
 use tbd::color::get_title_color;
 
-use crate::tui::{Tui, tui_mode::TuiMode};
+use crate::tui::{Tui, input::TuiInputMode};
 
 impl Tui {
     pub fn render_ui(&self) -> String {
@@ -52,10 +52,10 @@ impl Tui {
 
     fn render_footer(&self) -> String {
         let mode = match &self.mode {
-            TuiMode::Edit => "Edit",
-            TuiMode::Move => "Move",
+            TuiInputMode::Edit => "Edit",
+            TuiInputMode::Move => "Move",
 
-            TuiMode::Normal => "Normal",
+            TuiInputMode::Normal => "Normal",
         };
         let message = if let Some(message) = &self.message {
             message

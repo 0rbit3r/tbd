@@ -1,9 +1,9 @@
 mod raw_mode_guard;
 mod render_ui;
-mod tui_mode;
+mod input;
 
 use crate::tui::raw_mode_guard::RawModeGuard;
-use crate::tui::tui_mode::TuiMode;
+use crate::tui::input::TuiInputMode;
 use crossterm::event::{self, Event, KeyCode, KeyModifiers};
 use std::io;
 use std::io::Write;
@@ -47,7 +47,7 @@ pub fn run(task_file: TaskFile) -> io::Result<()> {
 struct Tui {
     task_file: TaskFile,
     cursor: usize,
-    mode: TuiMode,
+    mode: TuiInputMode,
     message: Option<String>
 }
 
@@ -56,7 +56,7 @@ impl Tui {
         Tui {
             task_file,
             cursor: 0,
-            mode: TuiMode::Normal,
+            mode: TuiInputMode::Normal,
             message: None,
         }
     }

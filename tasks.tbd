@@ -38,7 +38,7 @@
 [.] better tui
     [x] colors 
     [x] hints
-    [x] hide done/skipped
+    [x] hide done/skipped ...
         (collapsing)
     [.] flicker
     [ ] scroll
@@ -47,7 +47,7 @@
     [ ] 'it is done' label in header
 [ ] toggle hints on '?'
 [ ] better controls 
-    [ ] quick move
+    [x] quick move ...
         Leave moveUp as is
         but add shift+up as well
     [ ] quick mark (x, -, nontask etc.)
