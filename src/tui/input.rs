@@ -128,9 +128,21 @@ impl Tui {
                         }
                         self.mode = TuiInputMode::Edit;
                     }
+                    KeyCode::Char('c') if key_event.modifiers.is_empty() => {
+                        if let Some(task) = self.task_file.get_task_at_mut(self.cursor) {
+                            task.is_collapsed = false;
+                            task.subtasks.push(Task::new());
+                            self.cursor += task.get_count() - 1;
+                            self.mode = TuiInputMode::Edit;
+                        }
+                    }
                     KeyCode::Char('f') => {
                         if let Some(task) = self.task_file.get_task_at_mut(self.cursor) {
-                            task.is_collapsed = !task.is_collapsed;
+                            task.is_collapsed = if task.subtasks.len() == 0 {
+                                false
+                            } else {
+                                !task.is_collapsed
+                            }
                         }
                     }
                     KeyCode::Char('x') => {
@@ -148,9 +160,24 @@ impl Tui {
                             task.state = TaskState::Skipped;
                         }
                     }
-                    KeyCode::Char('n') => {
+                    KeyCode::Char('u') => {
+                        if let Some(task) = self.task_file.get_task_at_mut(self.cursor) {
+                            task.state = TaskState::Untouched;
+                        }
+                    }
+                    KeyCode::Char('N') => {
                         if let Some(task) = self.task_file.get_task_at_mut(self.cursor) {
                             task.state = TaskState::NonTask;
+                        }
+                    }
+                    KeyCode::Char('n') => {
+                        if let Some(task) = self.task_file.get_task_at_mut(self.cursor) {
+                            task.is_collapsed = false;
+                            let mut new_task = Task::new();
+                            new_task.state = TaskState::NonTask;
+                            task.subtasks.insert(0, new_task);
+                            self.cursor += 1;
+                            self.mode = TuiInputMode::Edit;
                         }
                     }
                     _ => {
@@ -212,12 +239,16 @@ impl Tui {
         match self.mode {
             TuiInputMode::Normal => {
                 "
-  ↓/↑/j/k: move cursor   PgUp/PgDn: move faster
-  ←/→/h/l: indentation       space: cycle states
-  i: edit      a: add       f: toggle fold
-  S: save      Q: quit      D: delete
-  [x] [.] [-] : set state n: toggle note"
-  
+    ↓/↑/j/k: move cursor (shift: move faster)
+  PgUp/PgDn: jump to next/previous task
+    ←/→/h/l: indentation
+      space: cycle states
+  a: add task    c: add subtask  n: add note
+  i: edit task   m: move task
+  f: fold task   
+  x: set Done    .: set Started  -: set Skipped
+  N: set note    u: set Untouched
+  S: save        Q: quit         D: delete"
             }
             TuiInputMode::Edit => {
                 "

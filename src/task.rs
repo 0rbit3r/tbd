@@ -23,7 +23,7 @@ impl Task {
     }
 
     pub fn get_count(&self) -> usize {
-        if self.subtasks.is_empty() || self.is_collapsed{
+        if self.subtasks.is_empty() || self.is_collapsed {
             1
         } else {
             1 + self.subtasks.iter().fold(0, |f, t| f + t.get_count())

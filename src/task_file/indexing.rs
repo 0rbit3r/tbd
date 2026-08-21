@@ -72,7 +72,8 @@ mod test {
 
     #[test]
     fn flat_list_happy() {
-        let task_file = TaskFile::from_string("path",
+        let task_file = TaskFile::from_string(
+            "path",
             "[ ] task A
 [ ] task B
 [ ] task C",
@@ -94,7 +95,8 @@ mod test {
 
     #[test]
     fn flat_list_sad() {
-        let task_file = TaskFile::from_string("path",
+        let task_file = TaskFile::from_string(
+            "path",
             "[ ] task A
 [ ] task B
 [ ] task C",
@@ -113,7 +115,8 @@ mod test {
 
     #[test]
     fn nested_list_happy() {
-        let task_file = TaskFile::from_string("path",
+        let task_file = TaskFile::from_string(
+            "path",
             "[ ] task A
     [ ] Nested task 1
     [ ] Nested task 2

@@ -1,9 +1,9 @@
+mod input;
 mod raw_mode_guard;
 mod render_ui;
-mod input;
 
-use crate::tui::raw_mode_guard::RawModeGuard;
 use crate::tui::input::TuiInputMode;
+use crate::tui::raw_mode_guard::RawModeGuard;
 use crossterm::event::{self, Event, KeyCode, KeyModifiers};
 use std::io;
 use std::io::Write;
@@ -25,13 +25,14 @@ pub fn run(task_file: TaskFile) -> io::Result<()> {
         rendered_lines.push(&clear_to_end);
         let rendered_lines = rendered_lines.join(&format!("\r\n{clear_line}"));
 
-        print!("{cursor_reset}{rendered_lines}");
+        print!("{cursor_reset}{clear_line}{rendered_lines}");
         io::stdout().flush()?;
 
         if let Event::Key(key_event) = event::read()?
             && tui.handle_input(key_event).is_none()
         {
             match key_event.code {
+                KeyCode::Char('?') => tui.hint_displayed = !tui.hint_displayed,
                 KeyCode::Char('Q') => break,
                 KeyCode::Char('c') if key_event.modifiers.contains(KeyModifiers::CONTROL) => {
                     break;
@@ -48,7 +49,8 @@ struct Tui {
     task_file: TaskFile,
     cursor: usize,
     mode: TuiInputMode,
-    message: Option<String>
+    message: Option<String>,
+    hint_displayed: bool,
 }
 
 impl Tui {
@@ -58,6 +60,7 @@ impl Tui {
             cursor: 0,
             mode: TuiInputMode::Normal,
             message: None,
+            hint_displayed: false,
         }
     }
 }

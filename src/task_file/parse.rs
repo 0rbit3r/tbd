@@ -2,7 +2,6 @@ use crate::task::Task;
 use crate::task_state::TaskState;
 
 /// This function will parse the string into provided Tasks vector.
-/// In case of syntax errors, affected lines will be added as Malformed tasks
 pub fn parse_line_and_add_to_task_list(line: &str, tasks: &mut Vec<Task>) {
     fn add_task(tasks: &mut Vec<Task>, title: &str, state: TaskState, collapsed: bool) {
         tasks.push(Task {
@@ -83,8 +82,8 @@ gibberish"
 
     #[test]
     fn parse_shallow() {
-        let task_file =
-            TaskFile::from_string("path",get_shallow_tasks_str()).expect("This content is parseable");
+        let task_file = TaskFile::from_string("path", get_shallow_tasks_str())
+            .expect("This content is parseable");
         let expected = vec![
             Task {
                 state: TaskState::Untouched,
@@ -124,8 +123,8 @@ gibberish"
 
     #[test]
     fn parse_nested() {
-        let task_file =
-            TaskFile::from_string("path",get_nested_tasks_str()).expect("This content is parseable");
+        let task_file = TaskFile::from_string("path", get_nested_tasks_str())
+            .expect("This content is parseable");
         let expected = vec![
             Task {
                 state: TaskState::Untouched,
@@ -215,7 +214,7 @@ gibberish"
     #[test]
     fn parse_and_render_mostly_equal() {
         let task_file =
-            TaskFile::from_string("path",get_nested_tasks_str()).expect("content is parseable");
+            TaskFile::from_string("path", get_nested_tasks_str()).expect("content is parseable");
         let rendered = task_file.render_file();
         assert_eq!(get_nested_tasks_str(), rendered)
     }

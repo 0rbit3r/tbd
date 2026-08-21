@@ -16,7 +16,8 @@ mod test {
 
     #[test]
     fn remove_nested_all() {
-        let mut task_file = TaskFile::from_string("path",
+        let mut task_file = TaskFile::from_string(
+            "path",
             "[ ] A
     [ ] B
         [ ] C
@@ -45,7 +46,8 @@ mod test {
 
     #[test]
     fn remove_one() {
-        let mut task_file = TaskFile::from_string("path",
+        let mut task_file = TaskFile::from_string(
+            "path",
             "[ ] A
     [ ] B
         [ ] C

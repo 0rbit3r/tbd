@@ -85,7 +85,7 @@ mod test {
         file.insert_task(Task::new(), None);
         file.indent_task(7);
         assert!(file.move_task_down(6).is_none()); // even when it has children
-        file.indent_task(6);// this should uncollapse the sibling a line up
+        file.indent_task(6); // this should uncollapse the sibling a line up
         assert!(file.move_task_down(8).is_none()); // even when it is a child itself
     }
 }

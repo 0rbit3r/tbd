@@ -35,24 +35,47 @@
     [x] open file
     [x] proper arg parsing
     [x] create new file
+[x] add image to README
+[x] make a video  ...
+    [x] pad the screen with some adhd nonsense
+    [x] write some introduction
+    [x] start recording
+    [x] post the video
+    [.] ???
+    [-] profit
+[.] better controls  ...
+    [x] quick move
+        Leave moveUp as is
+        but add shift+up as well
+    [x] quick mark (x, -, nontask etc.)
+    [ ] pageUp/Down in Move mode
 [.] better tui
     [x] colors 
     [x] hints
     [x] hide done/skipped ...
         (collapsing)
     [.] flicker
-    [ ] scroll
+    [x] scroll ...
+        [x] window dimensions
+        [x] header and footer dimension
+        [x] cursor
+            keep it in the center
+        [x] get slice of content to render
+        [x] boom - scroll done
+    [x] toggle hints on '?'
     [ ] border ??
     [ ] mouse support
     [ ] 'it is done' label in header
-[ ] toggle hints on '?'
-[ ] better controls 
-    [x] quick move ...
-        Leave moveUp as is
-        but add shift+up as well
-    [ ] quick mark (x, -, nontask etc.)
-[ ] cursor-based edit (and delete)  
+    [ ] wrap cursor at start/end   
+    [ ] cursor-based edit (and delete)  
+    [ ] open with cursor at last task
+    [ ] exit confirmation when unsaved
+    [ ] F to (un)fold all
 [.] bugs        
-    [ ] word-wrap breaks things
-    [x] move last down bug
     [x] indent task under collapsed
+    [x] move last down bug
+    [x] collapsable childless tasks
+    [x] header not clearing rest of line
+        eg. on terminal resize
+    [x] missing m for Move in hints
+    [ ] word-wrap breaks things
