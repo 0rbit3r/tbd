@@ -28,8 +28,10 @@ pub struct TaskFile {
 
 impl TaskFile {
     pub fn new(path: &str) -> TaskFile {
+        let mut path_with_extension = String::from(path);
+        if !path.ends_with(".tbd") { path_with_extension += ".tbd" }
         TaskFile {
-            path: path.to_string(),
+            path: path_with_extension,
             tasks: vec![],
             saved: false,
         }

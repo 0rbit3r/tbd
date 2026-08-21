@@ -35,6 +35,14 @@
     [x] open file
     [x] proper arg parsing
     [x] create new file
+    [x] better argument handling
+        [x] test that these work:
+            [x] non-existent file
+            [x] non-existent file in dir
+            [x] existing file in dir
+            [x] non-existent file in dir
+            [x] auto-open tbd file in current dir
+            [x] auto-open tbd file in subdir
 [x] add image to README
 [x] make a video  ...
     [x] pad the screen with some adhd nonsense
@@ -43,18 +51,12 @@
     [x] post the video
     [.] ???
     [-] profit
-[.] better controls  ...
-    [x] quick move
-        Leave moveUp as is
-        but add shift+up as well
-    [x] quick mark (x, -, nontask etc.)
-    [ ] pageUp/Down in Move mode
-[.] better tui
+[x] better tui ...
     [x] colors 
     [x] hints
     [x] hide done/skipped ...
         (collapsing)
-    [.] flicker
+    [x] less flicker
     [x] scroll ...
         [x] window dimensions
         [x] header and footer dimension
@@ -63,14 +65,19 @@
         [x] get slice of content to render
         [x] boom - scroll done
     [x] toggle hints on '?'
-    [ ] border ??
-    [ ] mouse support
-    [ ] 'it is done' label in header
-    [ ] wrap cursor at start/end   
-    [ ] cursor-based edit (and delete)  
-    [ ] open with cursor at last task
-    [ ] exit confirmation when unsaved
-    [ ] F to (un)fold all
+[.] better controls 
+    [x] quick move
+        Leave moveUp as is
+        but add shift+up as well
+    [x] quick mark (x, -, nontask etc.)
+    [ ] pageUp/Down in Move mode
+[ ] mouse support
+[ ] 'it is done' label in header
+[ ] wrap cursor at start/end   
+[ ] cursor-based edit (and delete)  
+[ ] exit confirmation when unsaved
+[ ] F to (un)fold all
+[ ] border ??
 [.] bugs        
     [x] indent task under collapsed
     [x] move last down bug
